@@ -7,8 +7,8 @@ import "./globals.css";
 // once we get to the actual design pass.
 
 export const metadata: Metadata = {
-  title: "SaaS Suite (placeholder name)",
-  description: "Placeholder — real title/description set once branding is locked.",
+  title: "SiteFlow",
+  description: "SiteFlow — AI chatbot, SEO, forms, and analytics tools for your website.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
