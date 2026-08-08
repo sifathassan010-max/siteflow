@@ -33,6 +33,17 @@ export default function DashboardShell({
           </Link>
 
           <nav className="hidden items-center gap-6 text-sm font-medium md:flex">
+            <Link
+              href="/dashboard"
+              className={
+                pathname === "/dashboard"
+                  ? "text-brand"
+                  : "text-ink/80 transition hover:text-ink"
+              }
+            >
+              Dashboard
+            </Link>
+
             {TOOLS.map((tool) => (
               <Link
                 key={tool.href}
