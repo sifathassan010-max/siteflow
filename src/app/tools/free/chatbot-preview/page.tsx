@@ -1,11 +1,20 @@
-export default function Page() {
+import { createClient } from "@/lib/supabase/server";
+import { redirect } from "next/navigation";
+import DashboardShell from "@/components/dashboard-shell";
+
+export default async function Page() {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
+
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center gap-3 p-8 text-center">
+    <DashboardShell email={user.email ?? ""}>
       <h1 className="text-2xl font-bold">Free chatbot preview</h1>
-      <p className="max-w-md text-slate">
-        Coming soon — this tool gets built in a later step. You&apos;re seeing
-        this because you&apos;re logged in and the paywall/trial check passed.
+      <p className="mt-2 max-w-md text-slate">
+        Coming soon \u2014 real functionality gets built here in a later step.
+        You&apos;re seeing this because you&apos;re logged in and the
+        paywall/trial check passed.
       </p>
-    </main>
+    </DashboardShell>
   );
 }
