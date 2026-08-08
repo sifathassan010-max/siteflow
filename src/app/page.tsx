@@ -110,7 +110,10 @@ export default function Home() {
           </p>
 
           <div className="mt-10 grid gap-5 sm:grid-cols-2">
-            <div className="rounded-2xl border border-line bg-white p-8 text-left">
+            <Link
+              href="/login"
+              className="rounded-2xl border border-line bg-white p-8 text-left transition hover:border-ink/30 hover:shadow-sm"
+            >
               <p className="text-sm font-semibold text-slate">Per tool</p>
               <p className="mt-2 text-3xl font-bold">
                 $25<span className="text-base font-medium text-slate">/mo</span>
@@ -118,8 +121,11 @@ export default function Home() {
               <p className="mt-2 text-sm text-slate">
                 Pick any single tool, cancel anytime.
               </p>
-            </div>
-            <div className="rounded-2xl border-2 border-brand bg-brand-bg p-8 text-left">
+            </Link>
+            <Link
+              href="/login"
+              className="rounded-2xl border-2 border-brand bg-brand-bg p-8 text-left transition hover:shadow-sm"
+            >
               <p className="text-sm font-semibold text-brand">All 4 tools</p>
               <p className="mt-2 text-3xl font-bold">
                 $55<span className="text-base font-medium text-slate">/mo</span>
@@ -127,7 +133,7 @@ export default function Home() {
               <p className="mt-2 text-sm text-slate">
                 Everything your website needs, one price.
               </p>
-            </div>
+            </Link>
           </div>
 
           <Link
