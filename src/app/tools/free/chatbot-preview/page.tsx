@@ -1,20 +1,26 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import DashboardShell from "@/components/dashboard-shell";
+import ChatbotPreviewWidget from "./chatbot-preview-widget";
 
 export default async function Page() {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
   return (
     <DashboardShell email={user.email ?? ""}>
       <h1 className="text-2xl font-bold">Free chatbot preview</h1>
-      <p className="mt-2 max-w-md text-slate">
-        Coming soon \u2014 real functionality gets built here in a later step.
-        You&apos;re seeing this because you&apos;re logged in and the
-        paywall/trial check passed.
+      <p className="mt-2 max-w-lg text-slate">
+        Try a live demo of what SiteFlow&apos;s Chatbot Builder can do. This
+        demo answers from general knowledge — a real one gets trained on your
+        own website content instead.
       </p>
+      <div className="mt-6">
+        <ChatbotPreviewWidget />
+      </div>
     </DashboardShell>
   );
 }
