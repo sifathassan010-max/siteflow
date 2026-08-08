@@ -17,14 +17,15 @@ export async function checkUsageLimit(userId: string, tool: string) {
 
   const { data: subscription } = await supabase
     .from("subscriptions")
-    .select("tier, status")
+    .select("status, unlocked_tools")
     .eq("user_id", userId)
     .single();
 
-  // Paid + active subscribers for this tier (or the bundle) skip limits entirely.
+  // Paid + active subscribers who own this specific tool (or bought the
+  // bundle, which just means all 4 tools are in unlocked_tools) skip limits.
   const isPaidActive =
     subscription?.status === "active" &&
-    (subscription.tier === tool || subscription.tier === "bundle");
+    (subscription.unlocked_tools ?? []).includes(tool);
 
   if (isPaidActive) return { allowed: true as const };
 
