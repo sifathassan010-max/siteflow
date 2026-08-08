@@ -2,18 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
-
-const TOOLS = [
-  { name: "Chatbot", href: "/tools/chatbot" },
-  { name: "SEO", href: "/tools/seo" },
-  { name: "Forms & Leads", href: "/tools/forms" },
-  { name: "Analytics", href: "/tools/analytics" },
-];
-
-const FREE_TOOLS = [
-  { name: "Meta tag checker", href: "/tools/free/meta-tags" },
-  { name: "Chatbot preview", href: "/tools/free/chatbot-preview" },
-];
+import { TOOLS, FREE_TOOLS, TOP_LINKS } from "@/lib/site-config";
 
 export default function Nav() {
   const [freeOpen, setFreeOpen] = useState(false);
@@ -64,6 +53,16 @@ export default function Nav() {
               </div>
             )}
           </div>
+
+          {TOP_LINKS.map((link) => (
+            <Link
+              key={link.href}
+              href={link.href}
+              className="text-ink/80 transition hover:text-ink"
+            >
+              {link.name}
+            </Link>
+          ))}
         </nav>
 
         <div className="flex items-center gap-3">
