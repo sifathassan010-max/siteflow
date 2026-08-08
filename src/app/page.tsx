@@ -4,7 +4,7 @@ import FlowDiagram from "@/components/flow-diagram";
 
 const TOOLS = [
   {
-    name: "Chatbot",
+    name: "Chatbot builder",
     tagline: "Train an AI chatbot on your own site content and answer visitors instantly, day or night.",
     href: "/tools/chatbot",
     color: "brand" as const,
@@ -102,47 +102,6 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="mx-auto max-w-4xl px-6 py-16 text-center">
-          <h2 className="text-2xl font-bold tracking-tight">Simple pricing</h2>
-          <p className="mt-3 text-slate">
-            Start free on any tool. Pay only for what you use, or get everything
-            in one plan.
-          </p>
-
-          <div className="mt-10 grid gap-5 sm:grid-cols-2">
-            <Link
-              href="/login"
-              className="rounded-2xl border border-line bg-white p-8 text-left transition hover:border-ink/30 hover:shadow-sm"
-            >
-              <p className="text-sm font-semibold text-slate">Per tool</p>
-              <p className="mt-2 text-3xl font-bold">
-                $25<span className="text-base font-medium text-slate">/mo</span>
-              </p>
-              <p className="mt-2 text-sm text-slate">
-                Pick any single tool, cancel anytime.
-              </p>
-            </Link>
-            <Link
-              href="/login"
-              className="rounded-2xl border-2 border-brand bg-brand-bg p-8 text-left transition hover:shadow-sm"
-            >
-              <p className="text-sm font-semibold text-brand">All 4 tools</p>
-              <p className="mt-2 text-3xl font-bold">
-                $55<span className="text-base font-medium text-slate">/mo</span>
-              </p>
-              <p className="mt-2 text-sm text-slate">
-                Everything your website needs, one price.
-              </p>
-            </Link>
-          </div>
-
-          <Link
-            href="/login"
-            className="mt-8 inline-block rounded-full bg-brand px-6 py-3 text-sm font-semibold text-white transition hover:bg-brand-hover"
-          >
-            Start your free trial
-          </Link>
-        </section>
       </main>
 
       <footer className="border-t border-line py-8">
