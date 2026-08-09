@@ -1,11 +1,9 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 
 export default function LoginPage() {
-  const router = useRouter()
   const supabase = createClient()
   const [identifier, setIdentifier] = useState('') // email OR username
   const [password, setPassword] = useState('')
@@ -46,8 +44,12 @@ export default function LoginPage() {
       return
     }
 
-    router.push('/dashboard')
-    router.refresh()
+    // A hard navigation here (not router.push) is intentional: it guarantees
+    // the very next request to the server carries the fresh auth cookie, and
+    // it wipes out any pages Next.js prefetched in the background *before*
+    // login finished (which would otherwise have cached a "not logged in"
+    // redirect for up to ~30s and kept serving it after login).
+    window.location.href = '/dashboard'
   }
 
   return (
