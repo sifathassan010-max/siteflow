@@ -12,7 +12,11 @@ const TRIAL_LIMITS: Record<string, number> = {
   analytics: 1000, // pageviews during trial
 };
 
-export async function checkUsageLimit(userId: string, tool: string) {
+export type UsageCheck =
+  | { allowed: true } // paid + active for this tool — no cap
+  | { allowed: boolean; used: number; limit: number }; // trial — capped
+
+export async function checkUsageLimit(userId: string, tool: string): Promise<UsageCheck> {
   const supabase = createAdminClient();
 
   const { data: subscription } = await supabase
