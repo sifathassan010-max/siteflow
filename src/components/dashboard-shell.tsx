@@ -35,6 +35,7 @@ export default function DashboardShell({
           <nav className="hidden items-center gap-6 text-sm font-medium md:flex">
             <Link
               href="/dashboard"
+              prefetch={false}
               className={
                 pathname === "/dashboard"
                   ? "text-brand"
@@ -48,6 +49,7 @@ export default function DashboardShell({
               <Link
                 key={tool.href}
                 href={tool.href}
+                prefetch={false}
                 className={
                   pathname === tool.href
                     ? "text-brand"
@@ -75,6 +77,7 @@ export default function DashboardShell({
                     <Link
                       key={tool.href}
                       href={tool.href}
+                      prefetch={false}
                       className="block rounded-lg px-3 py-2 text-sm text-ink/80 transition hover:bg-canvas hover:text-ink"
                     >
                       {tool.name}
@@ -88,6 +91,7 @@ export default function DashboardShell({
               <Link
                 key={link.href}
                 href={link.href}
+                prefetch={false}
                 className={
                   pathname === link.href
                     ? "text-brand"
@@ -118,6 +122,7 @@ export default function DashboardShell({
               <Link
                 key={link.href}
                 href={link.href}
+                prefetch={false}
                 className={
                   "rounded-lg px-3 py-2 text-sm font-medium transition " +
                   (pathname === link.href
