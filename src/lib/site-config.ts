@@ -35,6 +35,5 @@ export const TOP_LINKS = [
 export const SIDEBAR_LINKS = [
   { name: "Overview", href: "/dashboard" },
   { name: "Profile", href: "/dashboard/profile" },
-  { name: "Account", href: "/dashboard/account" },
   { name: "Settings", href: "/dashboard/settings" },
 ];
