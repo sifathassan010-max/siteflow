@@ -1,9 +1,10 @@
 // Run with: node --experimental-strip-types --test src/lib/profile-validation.test.ts
-// (Node 22+ can run .ts test files directly; on older Node, compile first or
-// rename a copy to .mjs with the TS types stripped.)
+// Note: this file is excluded from the Next.js build's type-check (see
+// tsconfig.json "exclude") because it's meant to run standalone via Node's
+// test runner, not as part of the app bundle.
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { validateProfileInput } from "./profile-validation.ts";
+import { validateProfileInput } from "./profile-validation";
 
 test("all fields empty is valid — nothing is mandatory", () => {
   const result = validateProfileInput({});
