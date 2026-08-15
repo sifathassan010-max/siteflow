@@ -14,7 +14,7 @@ export default async function EmbedPage({
 
   const { data: bot } = await admin
     .from("bots")
-    .select("id, name")
+    .select("id, name, quick_prompts, widget_color, logo_url, escalation_contact")
     .eq("id", id)
     .maybeSingle();
 
@@ -28,7 +28,14 @@ export default async function EmbedPage({
 
   return (
     <div className="flex h-screen flex-col bg-white">
-      <EmbedChatWidget botId={bot.id} botName={bot.name} />
+      <EmbedChatWidget
+        botId={bot.id}
+        botName={bot.name}
+        quickPrompts={bot.quick_prompts ?? []}
+        widgetColor={bot.widget_color ?? "#4f46e5"}
+        logoUrl={bot.logo_url}
+        escalationContact={bot.escalation_contact}
+      />
     </div>
   );
 }

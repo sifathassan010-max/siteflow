@@ -1,37 +1,21 @@
 import { createClient } from "@/lib/supabase/server";
 import { NextResponse } from "next/server";
-import * as cheerio from "cheerio";
+import { crawlSiteForTraining } from "@/lib/site-crawler";
+
+// Multi-page crawling can take a while — give this route more room than
+// the default 10s (Vercel Hobby plan supports up to 60s via maxDuration).
+export const maxDuration = 60;
 
 // Keep this generous but bounded — it gets pasted into every chat request
 // as context, so bigger isn't free (costs tokens on every message).
-const MAX_SITE_CONTENT_CHARS = 6000;
+const MAX_SITE_CONTENT_CHARS = 12000;
+
+// How many pages to follow from the root URL when training a new bot.
+const MAX_TRAINING_PAGES = 5;
 
 // Soft cap so one account can't spin up unlimited bots during testing.
 // Bump this later if you want tiered limits per plan.
 const MAX_BOTS_PER_USER = 5;
-
-async function crawlWebsite(url: string): Promise<string | null> {
-  try {
-    const target = new URL(url);
-    if (!["http:", "https:"].includes(target.protocol)) return null;
-
-    const res = await fetch(target.toString(), {
-      headers: { "User-Agent": "SiteFlow-BotBuilder/1.0" },
-      signal: AbortSignal.timeout(10000),
-    });
-    if (!res.ok) return null;
-
-    const html = await res.text();
-    const $ = cheerio.load(html);
-    $("script, style, noscript, svg").remove();
-
-    const text = $("body").text().replace(/\s+/g, " ").trim();
-    return text.slice(0, MAX_SITE_CONTENT_CHARS);
-  } catch {
-    // Crawl failing isn't fatal — the bot just falls back to persona-only.
-    return null;
-  }
-}
 
 export async function GET() {
   const supabase = await createClient();
@@ -85,8 +69,16 @@ export async function POST(request: Request) {
   }
 
   let siteContent: string | null = null;
+  let trainedPages: { url: string; chars: number }[] = [];
   if (websiteUrl && typeof websiteUrl === "string" && websiteUrl.trim()) {
-    siteContent = await crawlWebsite(websiteUrl.trim());
+    const { combinedText, pages } = await crawlSiteForTraining(
+      websiteUrl.trim(),
+      MAX_TRAINING_PAGES
+    );
+    if (combinedText) {
+      siteContent = combinedText.slice(0, MAX_SITE_CONTENT_CHARS);
+      trainedPages = pages;
+    }
   }
 
   const { data: bot, error } = await supabase
@@ -100,6 +92,8 @@ export async function POST(request: Request) {
           : "You are a helpful, friendly assistant for this business.",
       website_url: websiteUrl && typeof websiteUrl === "string" ? websiteUrl.trim() : null,
       site_content: siteContent,
+      trained_pages: trainedPages,
+      last_trained_at: siteContent ? new Date().toISOString() : null,
     })
     .select("id, name, persona, website_url, created_at")
     .single();
@@ -111,6 +105,7 @@ export async function POST(request: Request) {
   return NextResponse.json({
     bot,
     crawled: siteContent !== null,
+    pagesTrained: trainedPages.length,
     note:
       websiteUrl && siteContent === null
         ? "Bot created, but couldn't crawl that URL — it'll answer from its persona only. You can edit it later."

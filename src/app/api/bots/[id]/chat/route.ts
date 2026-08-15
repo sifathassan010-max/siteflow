@@ -2,9 +2,15 @@ import { createClient } from "@/lib/supabase/server";
 import { checkUsageLimit, logUsage } from "@/lib/usage";
 import { NextResponse } from "next/server";
 
-function buildSystemPrompt(persona: string, siteContent: string | null) {
-  if (!siteContent) return persona;
-  return `${persona}
+function buildSystemPrompt(
+  persona: string,
+  siteContent: string | null,
+  escalationContact: string | null
+) {
+  let prompt = persona;
+
+  if (siteContent) {
+    prompt += `
 
 You have the following information about the business's website. Use it to
 answer questions accurately. If something isn't covered by this content,
@@ -13,6 +19,17 @@ say you're not sure rather than making it up.
 --- WEBSITE CONTENT ---
 ${siteContent}
 --- END WEBSITE CONTENT ---`;
+  }
+
+  if (escalationContact) {
+    prompt += `
+
+If you don't know the answer, or the visitor asks to speak to a real
+person, tell them they can reach the business directly at
+${escalationContact} instead of guessing.`;
+  }
+
+  return prompt;
 }
 
 export async function POST(
@@ -31,7 +48,7 @@ export async function POST(
 
   const { data: bot } = await supabase
     .from("bots")
-    .select("id, user_id, persona, site_content")
+    .select("id, user_id, persona, site_content, model, escalation_contact")
     .eq("id", id)
     .eq("user_id", user.id)
     .maybeSingle();
@@ -71,9 +88,12 @@ export async function POST(
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "llama-3.1-8b-instant",
+        model: bot.model || "llama-3.1-8b-instant",
         messages: [
-          { role: "system", content: buildSystemPrompt(bot.persona, bot.site_content) },
+          {
+            role: "system",
+            content: buildSystemPrompt(bot.persona, bot.site_content, bot.escalation_contact),
+          },
           { role: "user", content: message },
         ],
         max_tokens: 300,
