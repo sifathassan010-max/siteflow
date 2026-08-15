@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { redirectToLoginIfUnauthorized } from "@/lib/auth-redirect";
 import FieldEditor from "./field-editor";
 import { DEFAULT_FIELDS, FormField } from "@/lib/form-types";
 
@@ -27,6 +28,7 @@ export default function NewFormForm() {
       const data = await res.json();
 
       if (!res.ok) {
+        if (redirectToLoginIfUnauthorized(res.status, router)) return;
         setError(data.error ?? "Something went wrong");
         setLoading(false);
         return;

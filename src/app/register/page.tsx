@@ -1,11 +1,10 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 
 export default function RegisterPage() {
-  const router = useRouter()
   const supabase = createClient()
   const [fullName, setFullName] = useState('')
   const [username, setUsername] = useState('')
@@ -69,17 +68,30 @@ export default function RegisterPage() {
 
   if (done) {
     return (
-      <div className="max-w-md mx-auto mt-24 px-6">
+      <div className="min-h-screen">
+        <header className="border-b border-line px-6 py-4">
+          <Link href="/" className="text-lg font-bold tracking-tight">
+            Site<span className="text-brand">Flow</span>
+          </Link>
+        </header>
+        <div className="max-w-md mx-auto mt-24 px-6">
         <h1 className="text-3xl font-bold mb-3">Check your email</h1>
         <p className="text-gray-600">
           We sent a confirmation link to {email}. Click it to activate your account, then log in.
         </p>
+        </div>
       </div>
     )
   }
 
   return (
-    <div className="max-w-md mx-auto mt-24 px-6">
+    <div className="min-h-screen">
+      <header className="border-b border-line px-6 py-4">
+        <Link href="/" className="text-lg font-bold tracking-tight">
+          Site<span className="text-brand">Flow</span>
+        </Link>
+      </header>
+      <div className="max-w-md mx-auto mt-24 px-6">
       <h1 className="text-3xl font-bold mb-6">Create your SiteFlow account</h1>
       <form onSubmit={handleSubmit} className="space-y-4">
         <input
@@ -118,6 +130,7 @@ export default function RegisterPage() {
       <p className="mt-4 text-sm text-gray-600">
         Already have an account? <a href="/login" className="underline">Log in</a>
       </p>
+      </div>
     </div>
   )
 }

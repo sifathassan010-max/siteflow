@@ -1,9 +1,12 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
-// Routes that require a logged-in user. Free tools live under /tools and
-// require login per SiteFlow's rule: no anonymous usage anywhere.
-const PROTECTED_PREFIXES = ["/dashboard", "/tools"];
+// Only the logged-in dashboard is hard-gated here. Tool pages under /tools
+// are publicly viewable (marketing/try-it-out UI) — each page decides for
+// itself what to show a logged-out visitor, and only actual actions (create
+// a bot, run a scan, etc.) require login, enforced by the API routes and by
+// each form redirecting to /login on a 401 response.
+const PROTECTED_PREFIXES = ["/dashboard"];
 
 export async function middleware(request: NextRequest) {
   let response = NextResponse.next({ request });

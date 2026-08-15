@@ -2,10 +2,13 @@
 
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { redirectToLoginIfUnauthorized } from "@/lib/auth-redirect";
 
 type Message = { role: "user" | "assistant"; content: string };
 
 export default function ChatbotPreviewWidget() {
+  const router = useRouter();
   const [messages, setMessages] = useState<Message[]>([
     {
       role: "assistant",
@@ -40,6 +43,7 @@ export default function ChatbotPreviewWidget() {
       const data = await res.json();
 
       if (!res.ok) {
+        if (redirectToLoginIfUnauthorized(res.status, router)) return;
         setError(data.error ?? "Something went wrong");
       } else {
         setMessages((m) => [...m, { role: "assistant", content: data.reply }]);

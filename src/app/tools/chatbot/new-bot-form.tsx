@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { redirectToLoginIfUnauthorized } from "@/lib/auth-redirect";
 
 export default function NewBotForm() {
   const router = useRouter();
@@ -25,6 +26,7 @@ export default function NewBotForm() {
       const data = await res.json();
 
       if (!res.ok) {
+        if (redirectToLoginIfUnauthorized(res.status, router)) return;
         setError(data.error ?? "Something went wrong");
         setLoading(false);
         return;

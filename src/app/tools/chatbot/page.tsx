@@ -1,16 +1,42 @@
 import { createClient } from "@/lib/supabase/server";
-import { redirect } from "next/navigation";
 import Link from "next/link";
 import DashboardShell from "@/components/dashboard-shell";
+import PublicToolShell from "@/components/public-tool-shell";
 import UsageBanner from "@/components/usage-banner";
 import NewBotForm from "./new-bot-form";
+
+const INTRO = (
+  <>
+    <h1 className="text-2xl font-bold">Chatbot builder</h1>
+    <p className="mt-2 max-w-lg text-slate">
+      Create a bot with a name, a persona/instructions, and — optionally —
+      your website URL so it can answer from your own content. Each bot
+      gets its own embeddable widget you can drop into any site.
+    </p>
+  </>
+);
 
 export default async function ChatbotBuilderPage() {
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) redirect("/login");
+
+  if (!user) {
+    return (
+      <PublicToolShell>
+        {INTRO}
+        <p className="mt-4 rounded-xl border border-dashed border-line bg-white p-4 text-sm text-slate">
+          You&apos;re viewing this without an account. Fill in the form below
+          to try it — you&apos;ll be asked to log in when you create your
+          first bot.
+        </p>
+        <div className="mt-6 max-w-md">
+          <NewBotForm />
+        </div>
+      </PublicToolShell>
+    );
+  }
 
   const { data: bots } = await supabase
     .from("bots")
@@ -20,12 +46,7 @@ export default async function ChatbotBuilderPage() {
 
   return (
     <DashboardShell email={user.email ?? ""}>
-      <h1 className="text-2xl font-bold">Chatbot builder</h1>
-      <p className="mt-2 max-w-lg text-slate">
-        Create a bot with a name, a persona/instructions, and — optionally —
-        your website URL so it can answer from your own content. Each bot
-        gets its own embeddable widget you can drop into any site.
-      </p>
+      {INTRO}
 
       <UsageBanner userId={user.id} tool="chatbot" />
 

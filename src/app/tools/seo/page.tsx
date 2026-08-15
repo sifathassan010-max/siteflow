@@ -1,7 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
-import { redirect } from "next/navigation";
 import Link from "next/link";
 import DashboardShell from "@/components/dashboard-shell";
+import PublicToolShell from "@/components/public-tool-shell";
 import UsageBanner from "@/components/usage-banner";
 import NewProjectForm from "./new-project-form";
 
@@ -11,12 +11,37 @@ function ScoreDot({ score }: { score: number | null }) {
   return <span className={`inline-block h-2.5 w-2.5 rounded-full ${color}`} />;
 }
 
+const INTRO = (
+  <>
+    <h1 className="text-2xl font-bold">SEO tool</h1>
+    <p className="mt-2 max-w-lg text-slate">
+      Add a site, run a scan, and get a scored on-page SEO audit across
+      multiple pages — not just one URL at a time.
+    </p>
+  </>
+);
+
 export default async function SeoPage() {
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) redirect("/login");
+
+  if (!user) {
+    return (
+      <PublicToolShell>
+        {INTRO}
+        <p className="mt-4 rounded-xl border border-dashed border-line bg-white p-4 text-sm text-slate">
+          You&apos;re viewing this without an account. Add a site below to
+          try it — you&apos;ll be asked to log in when you create your first
+          project.
+        </p>
+        <div className="mt-6 max-w-md">
+          <NewProjectForm />
+        </div>
+      </PublicToolShell>
+    );
+  }
 
   const { data: projects } = await supabase
     .from("seo_projects")
@@ -42,11 +67,7 @@ export default async function SeoPage() {
 
   return (
     <DashboardShell email={user.email ?? ""}>
-      <h1 className="text-2xl font-bold">SEO tool</h1>
-      <p className="mt-2 max-w-lg text-slate">
-        Add a site, run a scan, and get a scored on-page SEO audit across
-        multiple pages — not just one URL at a time.
-      </p>
+      {INTRO}
 
       <UsageBanner userId={user.id} tool="seo" />
 

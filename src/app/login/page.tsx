@@ -1,10 +1,15 @@
 'use client'
 
-import { useState } from 'react'
+import { Suspense, useState } from 'react'
+import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 
-export default function LoginPage() {
+function LoginForm() {
   const supabase = createClient()
+  const searchParams = useSearchParams()
+  const next = searchParams.get('next') || '/dashboard'
+
   const [identifier, setIdentifier] = useState('') // email OR username
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
@@ -48,8 +53,10 @@ export default function LoginPage() {
     // the very next request to the server carries the fresh auth cookie, and
     // it wipes out any pages Next.js prefetched in the background *before*
     // login finished (which would otherwise have cached a "not logged in"
-    // redirect for up to ~30s and kept serving it after login).
-    window.location.href = '/dashboard'
+    // redirect for up to ~30s and kept serving it after login). `next` sends
+    // people back to whatever tool page they were trying to use, instead of
+    // always dumping everyone on /dashboard regardless of where they came from.
+    window.location.href = next
   }
 
   return (
@@ -78,6 +85,21 @@ export default function LoginPage() {
       <p className="mt-4 text-sm text-gray-600">
         No account? <a href="/register" className="underline">Sign up</a>
       </p>
+    </div>
+  )
+}
+
+export default function LoginPage() {
+  return (
+    <div className="min-h-screen">
+      <header className="border-b border-line px-6 py-4">
+        <Link href="/" className="text-lg font-bold tracking-tight">
+          Site<span className="text-brand">Flow</span>
+        </Link>
+      </header>
+      <Suspense fallback={null}>
+        <LoginForm />
+      </Suspense>
     </div>
   )
 }

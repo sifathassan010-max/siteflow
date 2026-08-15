@@ -1,16 +1,41 @@
 import { createClient } from "@/lib/supabase/server";
-import { redirect } from "next/navigation";
 import Link from "next/link";
 import DashboardShell from "@/components/dashboard-shell";
+import PublicToolShell from "@/components/public-tool-shell";
 import UsageBanner from "@/components/usage-banner";
 import NewFormForm from "./new-form-form";
+
+const INTRO = (
+  <>
+    <h1 className="text-2xl font-bold">Forms &amp; lead capture</h1>
+    <p className="mt-2 max-w-lg text-slate">
+      Build a form with whatever fields you need, then embed it on your own
+      site. Every submission lands here in your dashboard.
+    </p>
+  </>
+);
 
 export default async function FormsPage() {
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) redirect("/login");
+
+  if (!user) {
+    return (
+      <PublicToolShell>
+        {INTRO}
+        <p className="mt-4 rounded-xl border border-dashed border-line bg-white p-4 text-sm text-slate">
+          You&apos;re viewing this without an account. Build a form below to
+          try it — you&apos;ll be asked to log in when you create your first
+          one.
+        </p>
+        <div className="mt-6 max-w-md">
+          <NewFormForm />
+        </div>
+      </PublicToolShell>
+    );
+  }
 
   const { data: forms } = await supabase
     .from("forms")
@@ -20,11 +45,7 @@ export default async function FormsPage() {
 
   return (
     <DashboardShell email={user.email ?? ""}>
-      <h1 className="text-2xl font-bold">Forms &amp; lead capture</h1>
-      <p className="mt-2 max-w-lg text-slate">
-        Build a form with whatever fields you need, then embed it on your own
-        site. Every submission lands here in your dashboard.
-      </p>
+      {INTRO}
 
       <UsageBanner userId={user.id} tool="forms" />
 

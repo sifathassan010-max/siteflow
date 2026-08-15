@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { redirectToLoginIfUnauthorized } from "@/lib/auth-redirect";
 
 type CheckResult = {
   url: string;
@@ -19,6 +21,7 @@ function StatusDot({ status }: { status: string }) {
 }
 
 export default function MetaCheckerForm() {
+  const router = useRouter();
   const [url, setUrl] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -38,6 +41,7 @@ export default function MetaCheckerForm() {
       });
       const data = await res.json();
       if (!res.ok) {
+        if (redirectToLoginIfUnauthorized(res.status, router)) return;
         setError(data.error ?? "Something went wrong");
       } else {
         setResult(data);
