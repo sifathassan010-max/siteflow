@@ -17,6 +17,11 @@ export const TOOLS = [
 export const FREE_TOOLS = [
   { name: "Meta tag checker", href: "/tools/free/meta-tags" },
   { name: "Chatbot preview", href: "/tools/free/chatbot-preview" },
+  { name: "Sitemap finder", href: "/tools/free/sitemap-checker" },
+  { name: "Sitemap validator", href: "/tools/free/sitemap-validator" },
+  { name: "Sitemap generator", href: "/tools/free/sitemap-generator" },
+  { name: "Sitemap URL extractor", href: "/tools/free/sitemap-url-extractor" },
+  { name: "Sitemap comparison", href: "/tools/free/sitemap-url-comparison" },
 ];
 
 // Extra standalone top-bar links (not tools, not a dropdown).
