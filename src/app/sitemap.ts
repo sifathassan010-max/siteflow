@@ -1,12 +1,18 @@
 import type { MetadataRoute } from "next";
 import { SITE_URL } from "@/lib/site-url";
 import { TOOLS, FREE_TOOLS } from "@/lib/site-config";
+import { createAdminClient } from "@/lib/supabase/admin";
 
 // Auto-served at /sitemap.xml by Next.js. Only lists pages a logged-out
 // visitor can actually land on and that are worth indexing — no /dashboard,
 // /api, /auth, /embed, or per-user dynamic tool pages (those are gated,
 // unique per account, and shouldn't be in search results at all).
-export default function sitemap(): MetadataRoute.Sitemap {
+//
+// Discussion threads are added dynamically below — every published thread
+// gets its own sitemap entry automatically, no manual step needed when a
+// new one is posted. Capped at the most recent 1,000; split into a proper
+// sitemap index if the thread count ever grows past that.
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date();
 
   const staticPages: MetadataRoute.Sitemap = [
@@ -32,5 +38,27 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.7,
   }));
 
-  return [...staticPages, ...toolPages, ...freeToolPages];
+  let threadPages: MetadataRoute.Sitemap = [];
+  try {
+    const supabase = createAdminClient();
+    const { data: threads } = await supabase
+      .from("discussion_threads")
+      .select("id, updated_at")
+      .order("updated_at", { ascending: false })
+      .limit(1000);
+
+    threadPages = (threads ?? []).map((thread) => ({
+      url: `${SITE_URL}/discussions/${thread.id}`,
+      lastModified: new Date(thread.updated_at),
+      changeFrequency: "weekly" as const,
+      priority: 0.6,
+    }));
+  } catch {
+    // If the discussions table doesn't exist yet (schema not run) or the
+    // query fails for any reason, fall back to just the static pages
+    // instead of breaking the whole sitemap.
+    threadPages = [];
+  }
+
+  return [...staticPages, ...toolPages, ...freeToolPages, ...threadPages];
 }
