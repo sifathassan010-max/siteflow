@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { SITE_URL } from "@/lib/site-url";
 
 // Note: swapped next/font/google for system fonts here since this sandbox
 // can't reach fonts.googleapis.com. Vercel's build servers can reach it fine,
@@ -7,6 +8,7 @@ import "./globals.css";
 // once we get to the actual design pass.
 
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
   title: "SiteFlow",
   description: "SiteFlow — AI chatbot, SEO, forms, and analytics tools for your website.",
 };
