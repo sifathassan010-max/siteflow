@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import DashboardShell from "@/components/dashboard-shell";
+import UsageBanner from "@/components/usage-banner";
 import NewBotForm from "./new-bot-form";
 
 export default async function ChatbotBuilderPage() {
@@ -25,6 +26,8 @@ export default async function ChatbotBuilderPage() {
         your website URL so it can answer from your own content. Each bot
         gets its own embeddable widget you can drop into any site.
       </p>
+
+      <UsageBanner userId={user.id} tool="chatbot" />
 
       <div className="mt-8 grid gap-8 lg:grid-cols-[1fr_320px]">
         <div>

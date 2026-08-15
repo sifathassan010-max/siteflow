@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import DashboardShell from "@/components/dashboard-shell";
+import AdBanner from "@/components/ad-banner";
 import MetaCheckerForm from "./meta-checker-form";
 
 export default async function Page() {
@@ -20,6 +21,8 @@ export default async function Page() {
       <div className="mt-6">
         <MetaCheckerForm />
       </div>
+
+      <AdBanner />
     </DashboardShell>
   );
 }

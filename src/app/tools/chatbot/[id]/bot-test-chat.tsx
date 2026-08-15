@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import { PATREON_JOIN_URL } from "@/lib/patreon-config";
 
 type Message = { role: "user" | "assistant"; content: string };
 
@@ -17,6 +18,7 @@ export default function BotTestChat({
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [limitHit, setLimitHit] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -32,6 +34,7 @@ export default function BotTestChat({
     setInput("");
     setLoading(true);
     setError("");
+    setLimitHit(false);
 
     try {
       const res = await fetch(`/api/bots/${botId}/chat`, {
@@ -43,6 +46,7 @@ export default function BotTestChat({
 
       if (!res.ok) {
         setError(data.error ?? "Something went wrong");
+        setLimitHit(res.status === 402);
       } else {
         setMessages((m) => [...m, { role: "assistant", content: data.reply }]);
       }
@@ -76,7 +80,21 @@ export default function BotTestChat({
         )}
       </div>
 
-      {error && <p className="px-4 pb-2 text-sm text-red-600">{error}</p>}
+      {error && (
+        <div className="px-4 pb-2">
+          <p className="text-sm text-red-600">{error}</p>
+          {limitHit && (
+            <a
+              href={PATREON_JOIN_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-1 inline-block text-sm font-semibold text-brand hover:underline"
+            >
+              Subscribe on Patreon →
+            </a>
+          )}
+        </div>
+      )}
 
       <form onSubmit={handleSubmit} className="flex gap-2 border-t border-line p-3">
         <input

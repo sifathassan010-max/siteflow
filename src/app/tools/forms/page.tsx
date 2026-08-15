@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import DashboardShell from "@/components/dashboard-shell";
+import UsageBanner from "@/components/usage-banner";
 import NewFormForm from "./new-form-form";
 
 export default async function FormsPage() {
@@ -24,6 +25,8 @@ export default async function FormsPage() {
         Build a form with whatever fields you need, then embed it on your own
         site. Every submission lands here in your dashboard.
       </p>
+
+      <UsageBanner userId={user.id} tool="forms" />
 
       <div className="mt-8 grid gap-8 lg:grid-cols-[1fr_360px]">
         <div>

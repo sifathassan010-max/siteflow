@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import DashboardShell from "@/components/dashboard-shell";
+import UsageBanner from "@/components/usage-banner";
 import NewSiteForm from "./new-site-form";
 
 export default async function AnalyticsPage() {
@@ -24,6 +25,8 @@ export default async function AnalyticsPage() {
         Add a site, drop one script tag on it, and see pageviews, top pages,
         and referrers here — no cookies, nothing that needs a consent banner.
       </p>
+
+      <UsageBanner userId={user.id} tool="analytics" />
 
       <div className="mt-8 grid gap-8 lg:grid-cols-[1fr_360px]">
         <div>

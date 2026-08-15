@@ -8,6 +8,10 @@
 // needs to change.
 // ============================================================
 
+// Your Patreon page — every "subscribe/upgrade" button on the site links
+// here. Change this one line to change it everywhere.
+export const PATREON_JOIN_URL = "https://www.patreon.com/15895599/join";
+
 export const TIER_TOOL_MAP: Record<string, string[]> = {
   "chatbot builder": ["chatbot"],
   "seo tool": ["seo"],

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Nav from "@/components/nav";
 import { TOOL_PLANS, BUNDLE_PLAN } from "@/lib/pricing-data";
+import { PATREON_JOIN_URL } from "@/lib/patreon-config";
 
 function Check() {
   return (
@@ -61,6 +62,14 @@ export default function PricingPage() {
               >
                 Start free trial
               </Link>
+              <a
+                href={PATREON_JOIN_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-2 rounded-full bg-brand px-4 py-2 text-center text-sm font-semibold text-white transition hover:bg-brand-hover"
+              >
+                Subscribe on Patreon
+              </a>
             </div>
           ))}
         </div>
@@ -94,10 +103,18 @@ export default function PricingPage() {
               </div>
               <Link
                 href="/login"
-                className="rounded-full bg-brand px-6 py-3 text-sm font-semibold text-white transition hover:bg-brand-hover"
+                className="rounded-full border border-brand px-6 py-3 text-sm font-semibold text-brand transition hover:bg-white"
               >
                 Start your free trial
               </Link>
+              <a
+                href={PATREON_JOIN_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="rounded-full bg-brand px-6 py-3 text-sm font-semibold text-white transition hover:bg-brand-hover"
+              >
+                Subscribe on Patreon
+              </a>
             </div>
           </div>
         </div>
