@@ -1,9 +1,22 @@
+import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import Link from "next/link";
 import DashboardShell from "@/components/dashboard-shell";
 import PublicToolShell from "@/components/public-tool-shell";
 import UsageBanner from "@/components/usage-banner";
 import NewSiteForm from "./new-site-form";
+
+export const metadata: Metadata = {
+  title: "Privacy-Friendly Website Analytics, No Cookie Banner Needed | SiteFlow",
+  description:
+    "Add one script tag to your site and see pageviews, top pages, and traffic sources — cookie-free, no consent banner required, and your data is never sold.",
+  alternates: { canonical: "/tools/analytics" },
+  openGraph: {
+    title: "Privacy-Friendly Website Analytics, No Cookie Banner Needed | SiteFlow",
+    description: "Cookie-free traffic insight for small business websites. No data sold.",
+    url: "/tools/analytics",
+  },
+};
 
 const INTRO = (
   <>

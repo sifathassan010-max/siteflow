@@ -1,6 +1,20 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import Nav from "@/components/nav";
 import FlowDiagram from "@/components/flow-diagram";
+
+export const metadata: Metadata = {
+  title: "Website Toolkit for Small Business: AI Chatbot, SEO, Forms & Analytics | SiteFlow",
+  description:
+    "SiteFlow bundles an AI chatbot trained on your own content, a small-business SEO audit tool, lead-capture forms, and cookie-free analytics into one login. Free to try on every tool.",
+  alternates: { canonical: "/" },
+  openGraph: {
+    title: "Website Toolkit for Small Business Websites | SiteFlow",
+    description:
+      "AI chatbot, SEO audit, lead-capture forms, and privacy-friendly analytics — one flow for small business websites.",
+    url: "/",
+  },
+};
 
 const TOOLS = [
   {

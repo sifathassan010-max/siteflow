@@ -1,9 +1,22 @@
+import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import Link from "next/link";
 import DashboardShell from "@/components/dashboard-shell";
 import PublicToolShell from "@/components/public-tool-shell";
 import UsageBanner from "@/components/usage-banner";
 import NewProjectForm from "./new-project-form";
+
+export const metadata: Metadata = {
+  title: "SEO Audit Tool for Small Business Websites | SiteFlow",
+  description:
+    "Scan your website's pages, catch what's holding back your search ranking, and fix it before customers bounce. Built for small business sites, not enterprise SEO teams.",
+  alternates: { canonical: "/tools/seo" },
+  openGraph: {
+    title: "SEO Audit Tool for Small Business Websites | SiteFlow",
+    description: "Scan your pages, catch ranking issues, and fix them before customers bounce.",
+    url: "/tools/seo",
+  },
+};
 
 function ScoreDot({ score }: { score: number | null }) {
   if (score === null) return null;

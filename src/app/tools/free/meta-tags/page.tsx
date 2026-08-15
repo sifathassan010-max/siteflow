@@ -1,8 +1,21 @@
+import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import DashboardShell from "@/components/dashboard-shell";
 import PublicToolShell from "@/components/public-tool-shell";
 import AdBanner from "@/components/ad-banner";
 import MetaCheckerForm from "./meta-checker-form";
+
+export const metadata: Metadata = {
+  title: "Free Meta Tag Checker — Preview Title, Description & OG Tags | SiteFlow",
+  description:
+    "Paste any URL and check its title tag, meta description, and social share preview tags at a glance. Free, no signup required.",
+  alternates: { canonical: "/tools/free/meta-tags" },
+  openGraph: {
+    title: "Free Meta Tag Checker — Preview Title, Description & OG Tags | SiteFlow",
+    description: "Check any page's title tag, meta description, and social preview tags.",
+    url: "/tools/free/meta-tags",
+  },
+};
 
 const INTRO = (
   <>

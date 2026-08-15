@@ -1,4 +1,17 @@
+import type { Metadata } from "next";
 import Nav from "@/components/nav";
+
+export const metadata: Metadata = {
+  title: "Discussions — Ask Questions & Share Tips for Small Business Websites | SiteFlow",
+  description:
+    "Join SiteFlow's community discussions to ask questions and share tips on running a small business website — chatbots, SEO, lead forms, and analytics.",
+  alternates: { canonical: "/discussions" },
+  openGraph: {
+    title: "SiteFlow Discussions — Community Q&A for Small Business Websites",
+    description: "Ask questions and share tips with other small business website owners.",
+    url: "/discussions",
+  },
+};
 
 export default function DiscussionsPage() {
   return (

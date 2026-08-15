@@ -1,8 +1,21 @@
+import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import DashboardShell from "@/components/dashboard-shell";
 import PublicToolShell from "@/components/public-tool-shell";
 import AdBanner from "@/components/ad-banner";
 import ChatbotPreviewWidget from "./chatbot-preview-widget";
+
+export const metadata: Metadata = {
+  title: "Free AI Chatbot Demo for Your Website | SiteFlow",
+  description:
+    "Try a live demo of SiteFlow's AI chatbot builder for small business websites. See how it answers visitor questions before training one on your own site content.",
+  alternates: { canonical: "/tools/free/chatbot-preview" },
+  openGraph: {
+    title: "Free AI Chatbot Demo for Your Website | SiteFlow",
+    description: "Try a live demo of SiteFlow's AI chatbot builder for small business websites.",
+    url: "/tools/free/chatbot-preview",
+  },
+};
 
 const INTRO = (
   <>

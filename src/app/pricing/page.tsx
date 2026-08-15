@@ -1,7 +1,20 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import Nav from "@/components/nav";
 import { TOOL_PLANS, BUNDLE_PLAN } from "@/lib/pricing-data";
 import { PATREON_JOIN_URL } from "@/lib/patreon-config";
+
+export const metadata: Metadata = {
+  title: "Pricing — Simple Plans for Small Business Website Tools | SiteFlow",
+  description:
+    "See SiteFlow's pricing for the AI chatbot builder, SEO audit tool, lead-capture forms, and analytics. Start free on any tool, pay only for what you use, or bundle everything.",
+  alternates: { canonical: "/pricing" },
+  openGraph: {
+    title: "SiteFlow Pricing — Chatbot, SEO, Forms & Analytics Plans",
+    description: "Simple, transparent pricing for small business website tools. Start free.",
+    url: "/pricing",
+  },
+};
 
 function Check() {
   return (

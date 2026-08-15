@@ -1,9 +1,22 @@
+import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import Link from "next/link";
 import DashboardShell from "@/components/dashboard-shell";
 import PublicToolShell from "@/components/public-tool-shell";
 import UsageBanner from "@/components/usage-banner";
 import NewFormForm from "./new-form-form";
+
+export const metadata: Metadata = {
+  title: "Lead Capture Forms & Widgets for Small Business Websites | SiteFlow",
+  description:
+    "Build a form with the fields you need, then embed it on your own site to turn visitors into leads. Drag-and-drop form builder made for small business websites.",
+  alternates: { canonical: "/tools/forms" },
+  openGraph: {
+    title: "Lead Capture Forms & Widgets for Small Business Websites | SiteFlow",
+    description: "Drag-and-drop forms plus on-site capture widgets that turn visitors into leads.",
+    url: "/tools/forms",
+  },
+};
 
 const INTRO = (
   <>

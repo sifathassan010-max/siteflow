@@ -1,9 +1,22 @@
+import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import Link from "next/link";
 import DashboardShell from "@/components/dashboard-shell";
 import PublicToolShell from "@/components/public-tool-shell";
 import UsageBanner from "@/components/usage-banner";
 import NewBotForm from "./new-bot-form";
+
+export const metadata: Metadata = {
+  title: "AI Chatbot Builder for Small Business Websites | SiteFlow",
+  description:
+    "Train an AI chatbot on your own website content and answer visitor questions instantly, day or night. No code required — set up a bot for your small business site in minutes.",
+  alternates: { canonical: "/tools/chatbot" },
+  openGraph: {
+    title: "AI Chatbot Builder for Small Business Websites | SiteFlow",
+    description: "Train an AI chatbot on your own site content and answer visitors instantly.",
+    url: "/tools/chatbot",
+  },
+};
 
 const INTRO = (
   <>
