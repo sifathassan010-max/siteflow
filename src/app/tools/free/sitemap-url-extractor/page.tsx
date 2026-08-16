@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import DashboardShell from "@/components/dashboard-shell";
 import PublicToolShell from "@/components/public-tool-shell";
 import AdBanner from "@/components/ad-banner";
+import AdBannerTop from "@/components/ad-banner-top";
 import SitemapUrlExtractorForm from "./sitemap-url-extractor-form";
 
 export const metadata: Metadata = {
@@ -31,6 +32,7 @@ export default async function Page() {
     return (
       <PublicToolShell>
         {INTRO}
+        <AdBannerTop />
         <div className="mt-6">
           <SitemapUrlExtractorForm />
         </div>
@@ -42,6 +44,7 @@ export default async function Page() {
   return (
     <DashboardShell email={user.email ?? ""}>
       {INTRO}
+      <AdBannerTop />
       <div className="mt-6">
         <SitemapUrlExtractorForm />
       </div>
