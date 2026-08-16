@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { SITE_URL } from "@/lib/site-url";
+import ServiceWorkerCleanup from "@/components/service-worker-cleanup";
 
 // Note: swapped next/font/google for system fonts here since this sandbox
 // can't reach fonts.googleapis.com. Vercel's build servers can reach it fine,
@@ -49,6 +50,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="en" className="h-full antialiased">
       <body className="min-h-full flex flex-col font-sans">
+        <ServiceWorkerCleanup />
         {children}
         <script
           type="application/ld+json"
