@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import Nav from "@/components/nav";
+import SiteFooter from "@/components/site-footer";
 import { TOOL_PLANS, BUNDLE_PLAN } from "@/lib/pricing-data";
 import { PATREON_JOIN_URL } from "@/lib/patreon-config";
 
@@ -133,11 +134,7 @@ export default function PricingPage() {
         </div>
       </main>
 
-      <footer className="border-t border-line py-8">
-        <div className="mx-auto max-w-6xl px-6 text-center text-sm text-slate">
-          SiteFlow
-        </div>
-      </footer>
+      <SiteFooter />
     </div>
   );
 }

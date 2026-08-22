@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import Nav from "@/components/nav";
+import SiteFooter from "@/components/site-footer";
 
 export const metadata: Metadata = {
   title: "Free Website & SEO Tools for Small Business | SiteFlow",
@@ -85,11 +86,7 @@ export default function FreeToolsPage() {
         </div>
       </main>
 
-      <footer className="border-t border-line py-8">
-        <div className="mx-auto max-w-6xl px-6 text-center text-sm text-slate">
-          SiteFlow
-        </div>
-      </footer>
+      <SiteFooter />
     </div>
   );
 }
