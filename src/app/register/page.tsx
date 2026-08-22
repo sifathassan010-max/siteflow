@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
+import SiteFooter from '@/components/site-footer'
 
 export default function RegisterPage() {
   const supabase = createClient()
@@ -80,6 +81,7 @@ export default function RegisterPage() {
           We sent a confirmation link to {email}. Click it to activate your account, then log in.
         </p>
         </div>
+        <SiteFooter />
       </div>
     )
   }
@@ -131,6 +133,7 @@ export default function RegisterPage() {
         Already have an account? <a href="/login" className="underline">Log in</a>
       </p>
       </div>
+      <SiteFooter />
     </div>
   )
 }

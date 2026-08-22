@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import Nav from "@/components/nav";
+import SiteFooter from "@/components/site-footer";
 import { createClient } from "@/lib/supabase/server";
 import ReplyForm from "./reply-form";
 
@@ -133,6 +134,7 @@ export default async function ThreadPage({
           <ReplyForm threadId={thread.id} />
         </div>
       </main>
+      <SiteFooter />
     </div>
   );
 }

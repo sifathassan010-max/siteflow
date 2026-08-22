@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Nav from "@/components/nav";
+import SiteFooter from "@/components/site-footer";
 import { redirectToLoginIfUnauthorized } from "@/lib/auth-redirect";
 import { TAG_GROUPS, MIN_TAGS, MAX_TAGS } from "@/lib/discussion-tags";
 import { countWords, NEW_THREAD_MIN_WORDS } from "@/lib/discussion-word-count";
@@ -164,6 +165,7 @@ export default function NewThreadPage() {
           </button>
         </form>
       </main>
+      <SiteFooter />
     </div>
   );
 }

@@ -5,6 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { TOOLS, FREE_TOOLS, TOP_LINKS, SIDEBAR_LINKS } from "@/lib/site-config";
+import SiteFooter from "@/components/site-footer";
 
 export default function DashboardShell({
   email,
@@ -144,6 +145,8 @@ export default function DashboardShell({
 
         <main className="min-w-0 flex-1">{children}</main>
       </div>
+
+      <SiteFooter />
     </div>
   );
 }
