@@ -44,7 +44,12 @@ function SupportColumn() {
       <h3 className="text-xs font-semibold uppercase tracking-wide text-ink">Support</h3>
       <ul className="mt-4 space-y-2.5">
         <li>
-          <span className="text-sm text-brand select-text">{SUPPORT_EMAIL}</span>
+          <span className="text-sm text-slate">Contact / Support</span>
+        </li>
+        <li>
+          <a href={`mailto:${SUPPORT_EMAIL}`} className="text-sm text-brand hover:underline">
+            {SUPPORT_EMAIL}
+          </a>
         </li>
       </ul>
     </div>
@@ -63,12 +68,6 @@ export default function SiteFooter() {
             Chatbot, forms, SEO, and analytics, built for people running a small business
             website, not a dev team.
           </p>
-          <a
-            href={`mailto:${SUPPORT_EMAIL}`}
-            className="mt-4 inline-block text-sm text-slate transition hover:text-ink"
-          >
-            {SUPPORT_EMAIL}
-          </a>
         </div>
 
         <div className="mt-10 grid grid-cols-2 gap-8 sm:grid-cols-3 lg:grid-cols-6">
