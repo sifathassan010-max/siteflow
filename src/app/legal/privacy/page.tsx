@@ -132,7 +132,12 @@ export default function PrivacyPage() {
               We take reasonable technical and organizational measures to protect the data we
               hold. No method of transmission or storage is completely secure, and we can't
               guarantee absolute security. We do not currently hold SOC 2, SOC 3, ISO 27001,
-              HIPAA, or similar third-party security certifications.
+              HIPAA, or similar third-party security certifications. For a detailed account of
+              the specific controls we do have in place, see our{" "}
+              <a href="/security" className="text-brand underline">
+                Security page
+              </a>
+              .
             </p>
           </section>
 

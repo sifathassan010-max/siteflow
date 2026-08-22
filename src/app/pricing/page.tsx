@@ -132,6 +132,12 @@ export default function PricingPage() {
             </div>
           </div>
         </div>
+
+        <p className="mt-6 text-center text-sm text-slate">
+          <Link href="/trust" className="underline hover:text-ink">
+            Security &amp; Privacy — view our Trust Center
+          </Link>
+        </p>
       </main>
 
       <SiteFooter />
