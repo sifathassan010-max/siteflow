@@ -12,6 +12,12 @@ import { createAdminClient } from "@/lib/supabase/admin";
 // gets its own sitemap entry automatically, no manual step needed when a
 // new one is posted. Capped at the most recent 1,000; split into a proper
 // sitemap index if the thread count ever grows past that.
+// Regenerated at most once per hour — without this, Next.js may generate
+// this file once at build time and cache it, meaning new discussion
+// threads or newly added free tools wouldn't show up here until the next
+// deploy. Given new content gets published daily, that gap matters.
+export const revalidate = 3600;
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date();
 
