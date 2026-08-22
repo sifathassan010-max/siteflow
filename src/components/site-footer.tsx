@@ -15,8 +15,6 @@ const LEGAL_LINKS = [
 
 const SUPPORT_EMAIL = "sifathassan010@gmail.com";
 
-const SUPPORT_LINKS = [{ name: "Contact / Support", href: `mailto:${SUPPORT_EMAIL}` }];
-
 function FooterColumn({
   title,
   links,
@@ -35,6 +33,19 @@ function FooterColumn({
             </Link>
           </li>
         ))}
+      </ul>
+    </div>
+  );
+}
+
+function SupportColumn() {
+  return (
+    <div>
+      <h3 className="text-xs font-semibold uppercase tracking-wide text-ink">Support</h3>
+      <ul className="mt-4 space-y-2.5">
+        <li>
+          <span className="text-sm text-brand select-text">{SUPPORT_EMAIL}</span>
+        </li>
       </ul>
     </div>
   );
@@ -66,7 +77,7 @@ export default function SiteFooter() {
           <FooterColumn title="Company" links={TOP_LINKS} />
           <FooterColumn title="Trust & Security" links={TRUST_LINKS} />
           <FooterColumn title="Legal" links={LEGAL_LINKS} />
-          <FooterColumn title="Support" links={SUPPORT_LINKS} />
+          <SupportColumn />
         </div>
 
         <div className="mt-12 border-t border-line pt-6 text-sm text-slate">
