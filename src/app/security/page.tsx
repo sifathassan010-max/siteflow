@@ -48,8 +48,9 @@ export default function SecurityPage() {
               email address before the account is usable.
             </Card>
             <Card title="Access controls">
-              Every database table SiteFlow uses has Row Level Security (RLS) enabled, so a
-              logged-in user can only read or write their own data by default.
+              Database tables use Row Level Security (RLS), so a logged-in user can only read or
+              write their own data by default. See &quot;Access control&quot; below for how this is
+              verified.
             </Card>
             <Card title="Data separation">
               The privileged key that can bypass RLS is only ever used in server-side code (API
@@ -58,7 +59,8 @@ export default function SecurityPage() {
             <Card title="Third-party infrastructure">
               We rely on established providers — Vercel, Supabase, Groq, and Patreon — for
               hosting, database/auth, AI inference, and billing, rather than running our own
-              servers for those functions.
+              servers for those functions. Our free tool pages also load two ad networks; see the
+              table below.
             </Card>
             <Card title="Security monitoring">
               We don't yet run a dedicated 24/7 security monitoring setup of our own — see the
@@ -124,12 +126,13 @@ export default function SecurityPage() {
         <section className="mt-10">
           <h2 className="text-lg font-bold text-ink">Access control</h2>
           <p className="mt-3 text-sm leading-relaxed text-ink">
-            SiteFlow uses Supabase Row Level Security (RLS) on every table it stores data in.
+            SiteFlow uses Supabase Row Level Security (RLS) on the tables it stores data in.
             Policies are scoped so a logged-in user can only select, insert, update, or delete
             rows tied to their own account. Public-facing widgets (chatbot, forms, and analytics
             embeds) that need to write data on behalf of an anonymous website visitor do so
             through server-side API routes using a separate, privileged service key — that key
-            is never exposed to any browser.
+            is confined to server-side code (API routes and webhooks) and is never bundled into
+            or exposed to any browser.
           </p>
         </section>
 
@@ -165,17 +168,30 @@ export default function SecurityPage() {
             </li>
             <li>SiteFlow itself stores the resulting conversation transcript, tied to an anonymous per-visitor session identifier rather than a real name.</li>
             <li>
-              We haven&apos;t independently verified whether Groq retains or trains on request
-              data beyond what&apos;s needed to serve the response — please refer to{" "}
+              Per Groq&apos;s own published terms, Groq does not retain chatbot inputs or outputs
+              beyond what&apos;s needed to serve the response, and isn&apos;t permitted to use
+              them to train or fine-tune any model unless a customer explicitly grants
+              permission — SiteFlow doesn&apos;t. Groq may temporarily log requests (kept up to
+              30 days) only to troubleshoot reliability issues or investigate suspected abuse.
+              For the current wording, see{" "}
+              <a
+                href="https://console.groq.com/docs/your-data"
+                className="text-brand underline"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Groq&apos;s data-handling documentation
+              </a>{" "}
+              and{" "}
               <a
                 href="https://groq.com/privacy-policy/"
                 className="text-brand underline"
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                Groq&apos;s own privacy documentation
-              </a>{" "}
-              for that.
+                Groq&apos;s privacy policy
+              </a>
+              .
             </li>
           </ul>
         </section>
@@ -207,14 +223,34 @@ export default function SecurityPage() {
                   <td className="py-3 pr-4 text-slate">AI inference for the chatbot tool</td>
                   <td className="py-3 text-slate">Chatbot persona, trained content, and visitor messages</td>
                 </tr>
-                <tr>
+                <tr className="border-b border-line">
                   <td className="py-3 pr-4 font-medium">Patreon</td>
                   <td className="py-3 pr-4 text-slate">Subscription billing and payment processing</td>
                   <td className="py-3 text-slate">Email address and plan/tier status (SiteFlow never handles card details directly)</td>
                 </tr>
+                <tr className="border-b border-line">
+                  <td className="py-3 pr-4 font-medium">Clickadilla</td>
+                  <td className="py-3 pr-4 text-slate">Ad network — free tool pages only</td>
+                  <td className="py-3 text-slate">Visitor IP, browser, and device info used to serve and measure ads; may set cookies</td>
+                </tr>
+                <tr>
+                  <td className="py-3 pr-4 font-medium">Monetag</td>
+                  <td className="py-3 pr-4 text-slate">Ad network — free tool pages only</td>
+                  <td className="py-3 text-slate">Visitor IP, browser, and device info used to serve and measure ads; may set cookies</td>
+                </tr>
               </tbody>
             </table>
           </div>
+          <p className="mt-3 text-sm leading-relaxed text-ink">
+            Clickadilla and Monetag are only loaded on SiteFlow&apos;s free tools (meta tag
+            checker, sitemap tools, chatbot preview) to help cover the cost of offering them for
+            free. They are never loaded on paid tool pages, the dashboard, or inside any embedded
+            chatbot, form, or analytics widget running on a customer&apos;s own website. See our{" "}
+            <a href="/legal/privacy#cookies" className="text-brand underline">
+              Privacy Policy
+            </a>{" "}
+            for how this affects cookies on the free tool pages.
+          </p>
           <p className="mt-3 text-sm text-slate">
             GitHub is used to store SiteFlow&apos;s source code during development. It doesn&apos;t
             receive customer data and isn&apos;t part of the production data path.

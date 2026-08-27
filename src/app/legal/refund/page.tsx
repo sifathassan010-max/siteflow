@@ -39,29 +39,49 @@ export default function RefundPage() {
           </section>
 
           <section>
-            <h2 className="text-lg font-bold">2. Requesting a refund</h2>
+            <h2 className="text-lg font-bold">2. 14-day money-back guarantee</h2>
             <p className="mt-3">
-              If something goes wrong — for example, you were charged in error, charged after a
-              cancellation, or a tool you paid for didn't work as described — contact us at{" "}
+              If you're not happy with a paid tool, email{" "}
               <a href={`mailto:${SUPPORT_EMAIL}`} className="text-brand underline">
                 {SUPPORT_EMAIL}
               </a>{" "}
-              within 14 days of the charge, with the email address on your account and the date of
-              the charge. We'll review requests case by case and let you know the outcome.
+              within 14 days of your first charge for that subscription, with the email address on
+              your account and the date of the charge, and we'll refund that charge in full — no
+              detailed explanation required. This guarantee applies once per subscription's first
+              billing cycle; it isn't a rolling refund window for every renewal charge.
             </p>
           </section>
 
           <section>
-            <h2 className="text-lg font-bold">3. Cancellations</h2>
+            <h2 className="text-lg font-bold">3. Other refund requests</h2>
             <p className="mt-3">
-              You can cancel a paid plan at any time from your account settings. Cancelling stops
-              future billing, but doesn't automatically refund the current billing period unless
-              it falls under Section 2 above.
+              Outside the 14-day window described above, if something goes wrong — for example,
+              you were charged in error, charged after cancelling, or a tool you paid for didn't
+              work as described — contact us at{" "}
+              <a href={`mailto:${SUPPORT_EMAIL}`} className="text-brand underline">
+                {SUPPORT_EMAIL}
+              </a>{" "}
+              with the email address on your account and the date of the charge. We'll review
+              these requests case by case and let you know the outcome.
             </p>
           </section>
 
           <section>
-            <h2 className="text-lg font-bold">4. Your statutory rights</h2>
+            <h2 className="text-lg font-bold">4. Cancellations</h2>
+            <p className="mt-3">
+              Paid subscriptions are currently processed through Patreon, so cancellation happens
+              through your Patreon subscription settings rather than SiteFlow account settings —
+              see our{" "}
+              <a href="/legal/terms" className="text-brand underline">
+                Terms of Service
+              </a>{" "}
+              for details. Cancelling stops future billing, but doesn't automatically refund the
+              current billing period unless it falls under Section 2 or 3 above.
+            </p>
+          </section>
+
+          <section>
+            <h2 className="text-lg font-bold">5. Your statutory rights</h2>
             <p className="mt-3">
               Nothing in this policy limits any refund, cancellation, or consumer protection right
               that cannot legally be excluded under the mandatory law of your jurisdiction.
@@ -69,7 +89,7 @@ export default function RefundPage() {
           </section>
 
           <section>
-            <h2 className="text-lg font-bold">5. Contact</h2>
+            <h2 className="text-lg font-bold">6. Contact</h2>
             <p className="mt-3">
               Refund questions can be sent to{" "}
               <a href={`mailto:${SUPPORT_EMAIL}`} className="text-brand underline">

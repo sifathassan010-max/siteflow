@@ -37,6 +37,18 @@ const SUBPROCESSORS = [
     data: "Email address and plan/tier status — SiteFlow does not handle card details directly",
     link: "https://www.patreon.com/policy/privacy",
   },
+  {
+    name: "Clickadilla",
+    purpose: "Ad network shown on free tool pages only (not paid tools, dashboard, or embeds)",
+    data: "Visitor IP address, browser/device info; may set cookies to serve and measure ads",
+    link: "https://publishers.clickadilla.com/privacy-policy",
+  },
+  {
+    name: "Monetag",
+    purpose: "Ad network shown on free tool pages only (not paid tools, dashboard, or embeds)",
+    data: "Visitor IP address, browser/device info; may set cookies to serve and measure ads",
+    link: "https://monetag.com/privacy/",
+  },
 ];
 
 export default function SubprocessorsPage() {

@@ -101,18 +101,25 @@ export default function TermsPage() {
           <section>
             <h2 className="text-lg font-bold">6. Paid plans, billing, and cancellation</h2>
             <p className="mt-3">
-              Paid tools are billed on the monthly or quarterly cycle you select at checkout.
-              Prices are shown on our{" "}
+              Paid subscriptions are currently processed through Patreon, a third-party payment
+              provider — subscribing sends you to Patreon to complete and manage your payment,
+              rather than through an in-app checkout on siteflow. Prices and the tiers each
+              subscription unlocks are shown on our{" "}
               <a href="/pricing" className="text-brand underline">
                 Pricing
               </a>{" "}
-              page. You can cancel a paid plan at any time from your account settings; cancellation
-              stops future billing but does not itself entitle you to a refund for the current
-              billing period — see our{" "}
+              page. Because billing runs through Patreon, you cancel a paid plan through your
+              Patreon subscription settings, not from SiteFlow account settings. Cancelling stops
+              future billing but does not itself entitle you to a refund for the current billing
+              period — see our{" "}
               <a href="/legal/refund" className="text-brand underline">
                 Refund Policy
               </a>{" "}
-              for how refunds work.
+              for how refunds work. See our{" "}
+              <a href="/subprocessors" className="text-brand underline">
+                Subprocessors
+              </a>{" "}
+              page for how Patreon handles your billing data.
             </p>
           </section>
 

@@ -36,13 +36,24 @@ export default function PrivacyPage() {
             <h2 className="text-lg font-bold">1. Information we collect</h2>
             <p className="mt-3 font-semibold">From SiteFlow account holders:</p>
             <ul className="mt-2 list-disc space-y-1 pl-5">
-              <li>Account information: name, email address, and login credentials.</li>
+              <li>
+                Account information: email address, login credentials, and optional profile
+                fields you choose to add (name, username, company name, website URL, country).
+              </li>
               <li>
                 Content you provide to configure your tools — for example, pages or text you use
                 to train a chatbot, form field definitions, or the domain you connect for
                 analytics.
               </li>
-              <li>Billing information needed to process payment for paid plans.</li>
+              <li>
+                Subscription information: paid plans are currently processed through Patreon
+                (see &quot;Where data is stored&quot; below and our{" "}
+                <a href="/subprocessors" className="text-brand underline">
+                  Subprocessors
+                </a>{" "}
+                page). SiteFlow receives your subscribed tier and subscription status from
+                Patreon, not your card or payment details — Patreon handles those directly.
+              </li>
             </ul>
             <p className="mt-3 font-semibold">From your website visitors, on your behalf:</p>
             <ul className="mt-2 list-disc space-y-1 pl-5">
@@ -86,13 +97,24 @@ export default function PrivacyPage() {
             </p>
           </section>
 
-          <section>
+          <section id="cookies">
             <h2 className="text-lg font-bold">4. Cookies</h2>
             <p className="mt-3">
               Our own analytics tool is designed to work without cookies. The SiteFlow website and
               dashboard itself may use strictly necessary cookies or local storage to keep you
-              logged in and remember basic preferences. We don't use third-party advertising
-              cookies.
+              logged in and remember basic preferences.
+            </p>
+            <p className="mt-3">
+              SiteFlow's free tools (meta tag checker, sitemap tools, chatbot preview) are
+              supported by two advertising networks, Clickadilla and Monetag, which are loaded
+              only on those free tool pages. They may set their own cookies or use similar
+              technologies to serve and measure ads, under their own privacy policies — see our{" "}
+              <a href="/subprocessors" className="text-brand underline">
+                Subprocessors
+              </a>{" "}
+              page for links. These ad networks are never loaded on paid tool pages, the
+              dashboard, or inside any chatbot, form, or analytics widget embedded on a customer's
+              own website.
             </p>
           </section>
 

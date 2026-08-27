@@ -20,6 +20,26 @@ function StatusCard({ title, children }: { title: string; children: React.ReactN
   );
 }
 
+function StatusLinkCard({
+  title,
+  description,
+  href,
+}: {
+  title: string;
+  description: string;
+  href: string;
+}) {
+  return (
+    <Link
+      href={href}
+      className="block rounded-xl border border-line p-5 transition hover:border-ink/20 hover:shadow-sm"
+    >
+      <h3 className="font-semibold text-ink">{title}</h3>
+      <p className="mt-2 text-sm text-slate">{description}</p>
+    </Link>
+  );
+}
+
 function LinkCard({
   title,
   description,
@@ -59,9 +79,13 @@ export default function TrustCenterPage() {
         </p>
 
         <section className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <StatusCard title="Security">Security practices and controls</StatusCard>
-          <StatusCard title="Privacy">How we handle customer data</StatusCard>
-          <StatusCard title="Infrastructure">Hosting and service providers</StatusCard>
+          <StatusLinkCard title="Security" description="Security practices and controls" href="/security" />
+          <StatusLinkCard title="Privacy" description="How we handle customer data" href="/legal/privacy" />
+          <StatusLinkCard
+            title="Infrastructure & Subprocessors"
+            description="See the services that power SiteFlow."
+            href="/subprocessors"
+          />
           <StatusCard title="Compliance">No independent security certifications currently held</StatusCard>
         </section>
 
