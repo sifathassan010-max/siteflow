@@ -41,4 +41,5 @@ export const SIDEBAR_LINKS = [
   { name: "Overview", href: "/dashboard" },
   { name: "Profile", href: "/dashboard/profile" },
   { name: "Settings", href: "/dashboard/settings" },
+  { name: "API keys", href: "/dashboard/settings/api-keys" },
 ];

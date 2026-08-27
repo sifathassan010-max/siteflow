@@ -31,3 +31,29 @@ export function tiersToUnlockedTools(tierTitles: string[]): string[] {
   }
   return Array.from(tools);
 }
+
+// ============================================================
+// API TIERS — for developers / AI agents calling SiteFlow's tools
+// programmatically (see src/app/api/v1/**), rather than logging into
+// the dashboard. Sold and billed separately from the tiers above, so a
+// customer can have dashboard access, API access, both, or neither.
+// $25/mo = 1,000 calls/mo for that one tool's API.
+// $55/mo (All Access API) = 1,000 calls/mo for EACH of the four tools.
+// ============================================================
+export const TIER_API_TOOL_MAP: Record<string, string[]> = {
+  "chatbot api": ["chatbot"],
+  "seo api": ["seo"],
+  "forms api": ["forms"],
+  "analytics api": ["analytics"],
+  "all access api": ["chatbot", "seo", "forms", "analytics"],
+};
+
+export function tiersToUnlockedApiTools(tierTitles: string[]): string[] {
+  const tools = new Set<string>();
+  for (const title of tierTitles) {
+    const key = title.trim().toLowerCase();
+    const mapped = TIER_API_TOOL_MAP[key];
+    if (mapped) mapped.forEach((t) => tools.add(t));
+  }
+  return Array.from(tools);
+}

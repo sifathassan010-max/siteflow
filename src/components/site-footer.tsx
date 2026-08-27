@@ -13,6 +13,10 @@ const LEGAL_LINKS = [
   { name: "Refund Policy", href: "/legal/refund" },
 ];
 
+// Footer-only — deliberately not in TOOLS/TOP_LINKS so it doesn't clutter
+// the main site nav for non-developer visitors.
+const DEVELOPER_LINKS = [{ name: "API docs", href: "/api-docs" }];
+
 const SUPPORT_EMAIL = "sifathassan010@gmail.com";
 
 function FooterColumn({
@@ -71,7 +75,7 @@ export default function SiteFooter() {
         </div>
 
         <div className="mt-10 grid grid-cols-2 gap-8 sm:grid-cols-3 lg:grid-cols-6">
-          <FooterColumn title="Product" links={TOOLS} />
+          <FooterColumn title="Product" links={[...TOOLS, ...DEVELOPER_LINKS]} />
           <FooterColumn title="Free tools" links={FREE_TOOLS} />
           <FooterColumn title="Company" links={TOP_LINKS} />
           <FooterColumn title="Trust & Security" links={TRUST_LINKS} />
