@@ -117,6 +117,24 @@ export default function Home() {
           </div>
         </section>
 
+        <section className="py-14">
+          <div className="mx-auto max-w-6xl px-6">
+            <div className="rounded-2xl border border-line bg-white px-6 py-8 text-center">
+              <h2 className="text-base font-bold tracking-tight">Built with transparency</h2>
+              <p className="mx-auto mt-2 max-w-xl text-sm text-slate">
+                Secure connections &bull; Transparent data practices &bull; Free trial &bull; Clear
+                refund policy
+              </p>
+              <Link
+                href="/trust"
+                className="mt-4 inline-block text-sm font-semibold text-brand hover:underline"
+              >
+                View our Trust Center →
+              </Link>
+            </div>
+          </div>
+        </section>
+
       </main>
 
       <SiteFooter />

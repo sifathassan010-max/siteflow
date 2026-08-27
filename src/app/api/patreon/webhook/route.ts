@@ -1,5 +1,5 @@
 import { createAdminClient } from "@/lib/supabase/admin";
-import { tiersToUnlockedTools } from "@/lib/patreon-config";
+import { tiersToUnlockedTools, tiersToUnlockedApiTools } from "@/lib/patreon-config";
 import { NextResponse } from "next/server";
 import crypto from "crypto";
 
@@ -57,11 +57,13 @@ export async function POST(request: Request) {
   }
 
   let unlockedTools: string[] = [];
+  let unlockedApiTools: string[] = [];
   let status: "active" | "canceled" = "active";
 
   if (event === "members:pledge:delete") {
-    // Pledge canceled — revoke everything.
+    // Pledge canceled — revoke everything, dashboard AND API access.
     unlockedTools = [];
+    unlockedApiTools = [];
     status = "canceled";
   } else {
     // Find all tier titles this member is currently entitled to.
@@ -69,17 +71,19 @@ export async function POST(request: Request) {
       .filter((item) => item.type === "tier")
       .map((item) => (item.attributes?.title as string) ?? "");
     unlockedTools = tiersToUnlockedTools(tierTitles);
-    status = unlockedTools.length > 0 ? "active" : "canceled";
+    unlockedApiTools = tiersToUnlockedApiTools(tierTitles);
+    status = unlockedTools.length > 0 || unlockedApiTools.length > 0 ? "active" : "canceled";
   }
 
   await supabase
     .from("subscriptions")
     .update({
       unlocked_tools: unlockedTools,
+      api_unlocked_tools: unlockedApiTools,
       status,
       updated_at: new Date().toISOString(),
     })
     .eq("user_id", profile.id);
 
-  return NextResponse.json({ ok: true, unlockedTools, status });
+  return NextResponse.json({ ok: true, unlockedTools, unlockedApiTools, status });
 }
