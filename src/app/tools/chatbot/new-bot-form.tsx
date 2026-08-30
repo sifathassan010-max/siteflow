@@ -3,12 +3,15 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { redirectToLoginIfUnauthorized } from "@/lib/auth-redirect";
+import CustomQueryEditor from "./custom-query-editor";
+import { emptyCustomQuery, type CustomQuery } from "@/lib/chatbot-custom-queries";
 
-export default function NewBotForm() {
+export default function NewBotForm({ isPaid = false }: { isPaid?: boolean }) {
   const router = useRouter();
   const [name, setName] = useState("");
   const [persona, setPersona] = useState("");
   const [websiteUrl, setWebsiteUrl] = useState("");
+  const [customQueries, setCustomQueries] = useState<CustomQuery[]>([emptyCustomQuery()]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -21,7 +24,12 @@ export default function NewBotForm() {
       const res = await fetch("/api/bots", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, persona, website_url: websiteUrl }),
+        body: JSON.stringify({
+          name,
+          persona,
+          website_url: websiteUrl,
+          custom_queries: customQueries,
+        }),
       });
       const data = await res.json();
 
@@ -89,6 +97,12 @@ export default function NewBotForm() {
           own content.
         </p>
       </div>
+
+      <CustomQueryEditor
+        queries={customQueries}
+        onChange={setCustomQueries}
+        isPaid={isPaid}
+      />
 
       {error && <p className="text-sm text-red-600">{error}</p>}
 

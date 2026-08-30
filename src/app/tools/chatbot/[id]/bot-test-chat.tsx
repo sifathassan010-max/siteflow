@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { PATREON_JOIN_URL } from "@/lib/patreon-config";
+import Link from "next/link";
 
 type Message = { role: "user" | "assistant"; content: string };
 
@@ -84,14 +84,12 @@ export default function BotTestChat({
         <div className="px-4 pb-2">
           <p className="text-sm text-red-600">{error}</p>
           {limitHit && (
-            <a
-              href={PATREON_JOIN_URL}
-              target="_blank"
-              rel="noopener noreferrer"
+            <Link
+              href="/pricing"
               className="mt-1 inline-block text-sm font-semibold text-brand hover:underline"
             >
-              Subscribe on Patreon →
-            </a>
+              See the Pricing →
+            </Link>
           )}
         </div>
       )}

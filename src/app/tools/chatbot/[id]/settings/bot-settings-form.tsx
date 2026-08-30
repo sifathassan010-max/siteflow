@@ -2,6 +2,9 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
+import CustomQueryEditor from "../../custom-query-editor";
+import { emptyCustomQuery, type CustomQuery } from "@/lib/chatbot-custom-queries";
 
 type Bot = {
   id: string;
@@ -13,6 +16,7 @@ type Bot = {
   logo_url: string | null;
   escalation_contact: string | null;
   model: string;
+  custom_queries: CustomQuery[];
   trained_pages: { url: string; chars: number }[];
   last_trained_at: string | null;
 };
@@ -22,7 +26,13 @@ const MODEL_OPTIONS = [
   { value: "llama-3.3-70b-versatile", label: "Thorough (llama-3.3-70b-versatile)" },
 ];
 
-export default function BotSettingsForm({ bot }: { bot: Bot }) {
+export default function BotSettingsForm({
+  bot,
+  isPaid = false,
+}: {
+  bot: Bot;
+  isPaid?: boolean;
+}) {
   const router = useRouter();
 
   const [persona, setPersona] = useState(bot.persona);
@@ -31,6 +41,9 @@ export default function BotSettingsForm({ bot }: { bot: Bot }) {
   const [logoUrl, setLogoUrl] = useState(bot.logo_url ?? "");
   const [escalationContact, setEscalationContact] = useState(bot.escalation_contact ?? "");
   const [model, setModel] = useState(bot.model);
+  const [customQueries, setCustomQueries] = useState<CustomQuery[]>(
+    bot.custom_queries.length > 0 ? bot.custom_queries : [emptyCustomQuery()]
+  );
 
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState("");
@@ -61,6 +74,7 @@ export default function BotSettingsForm({ bot }: { bot: Bot }) {
           logo_url: logoUrl,
           escalation_contact: escalationContact,
           model,
+          custom_queries: customQueries,
         }),
       });
       const data = await res.json();
@@ -186,6 +200,12 @@ export default function BotSettingsForm({ bot }: { bot: Bot }) {
           </p>
         </div>
 
+        <CustomQueryEditor
+          queries={customQueries}
+          onChange={setCustomQueries}
+          isPaid={isPaid}
+        />
+
         {saveError && <p className="text-sm text-red-600">{saveError}</p>}
 
         <button
@@ -195,6 +215,19 @@ export default function BotSettingsForm({ bot }: { bot: Bot }) {
         >
           {saving ? "Saving…" : saved ? "Saved ✓" : "Save changes"}
         </button>
+
+        {saved && (
+          <p className="text-xs text-slate">
+            Your embed code doesn&apos;t change — the widget pulls these
+            updates live. If you need the code again,{" "}
+            <Link
+              href={`/tools/chatbot/${bot.id}`}
+              className="font-semibold text-brand hover:underline"
+            >
+              view it on the bot page →
+            </Link>
+          </p>
+        )}
       </form>
 
       {bot.website_url && (

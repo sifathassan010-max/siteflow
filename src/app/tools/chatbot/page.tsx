@@ -5,6 +5,7 @@ import DashboardShell from "@/components/dashboard-shell";
 import PublicToolShell from "@/components/public-tool-shell";
 import UsageBanner from "@/components/usage-banner";
 import NewBotForm from "./new-bot-form";
+import { isPaidForTool } from "@/lib/usage";
 
 export const metadata: Metadata = {
   title: "AI Chatbot Builder for Small Business Websites | SiteFlow",
@@ -45,17 +46,20 @@ export default async function ChatbotBuilderPage() {
           first bot.
         </p>
         <div className="mt-6 max-w-md">
-          <NewBotForm />
+          <NewBotForm isPaid={false} />
         </div>
       </PublicToolShell>
     );
   }
 
-  const { data: bots } = await supabase
-    .from("bots")
-    .select("id, name, website_url, created_at")
-    .eq("user_id", user.id)
-    .order("created_at", { ascending: false });
+  const [{ data: bots }, isPaid] = await Promise.all([
+    supabase
+      .from("bots")
+      .select("id, name, website_url, created_at")
+      .eq("user_id", user.id)
+      .order("created_at", { ascending: false }),
+    isPaidForTool(user.id, "chatbot"),
+  ]);
 
   return (
     <DashboardShell email={user.email ?? ""}>
@@ -93,7 +97,7 @@ export default async function ChatbotBuilderPage() {
         <div>
           <h2 className="text-sm font-semibold text-slate">Create a new bot</h2>
           <div className="mt-3">
-            <NewBotForm />
+            <NewBotForm isPaid={isPaid} />
           </div>
         </div>
       </div>

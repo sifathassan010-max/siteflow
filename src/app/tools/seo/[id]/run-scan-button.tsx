@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { PATREON_JOIN_URL } from "@/lib/patreon-config";
+import Link from "next/link";
 
 export default function RunScanButton({ projectId }: { projectId: string }) {
   const router = useRouter();
@@ -47,14 +47,12 @@ export default function RunScanButton({ projectId }: { projectId: string }) {
         <div className="mt-2">
           <p className="text-sm text-red-600">{error}</p>
           {limitHit && (
-            <a
-              href={PATREON_JOIN_URL}
-              target="_blank"
-              rel="noopener noreferrer"
+            <Link
+              href="/pricing"
               className="mt-1 inline-block text-sm font-semibold text-brand hover:underline"
             >
-              Subscribe on Patreon →
-            </a>
+              See the Pricing →
+            </Link>
           )}
         </div>
       )}
