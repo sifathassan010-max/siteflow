@@ -3,7 +3,7 @@ import Link from "next/link";
 import Nav from "@/components/nav";
 import SiteFooter from "@/components/site-footer";
 import { TOOL_PLANS, BUNDLE_PLAN, API_TOOL_PLANS, API_BUNDLE_PLAN } from "@/lib/pricing-data";
-import { PATREON_JOIN_URL } from "@/lib/patreon-config";
+import { PatreonBuyButton } from "@/components/patreon-buy-button";
 
 export const metadata: Metadata = {
   title: "Pricing — Simple Plans for Small Business Website Tools | SiteFlow",
@@ -59,9 +59,6 @@ export default function PricingPage() {
                 ${plan.monthlyPrice}
                 <span className="text-base font-medium text-slate">/mo</span>
               </p>
-              <p className="mt-1 text-xs text-slate">
-                or ${plan.quarterlyPrice} billed every 3 months
-              </p>
               <ul className="mt-4 flex flex-1 flex-col gap-2 text-sm text-slate">
                 {plan.features.map((f) => (
                   <li key={f} className="flex items-start gap-2">
@@ -76,14 +73,10 @@ export default function PricingPage() {
               >
                 Start free trial
               </Link>
-              <a
-                href={PATREON_JOIN_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="mt-2 rounded-full bg-brand px-4 py-2 text-center text-sm font-semibold text-white transition hover:bg-brand-hover"
-              >
-                Subscribe on Patreon
-              </a>
+              <PatreonBuyButton
+                wrapperClassName="mt-2"
+                className="w-full rounded-full bg-brand px-4 py-2 text-center text-sm font-semibold text-white transition hover:bg-brand-hover"
+              />
             </div>
           ))}
         </div>
@@ -111,9 +104,6 @@ export default function PricingPage() {
                   ${BUNDLE_PLAN.monthlyPrice}
                   <span className="text-base font-medium text-slate">/mo</span>
                 </p>
-                <p className="text-xs text-slate">
-                  or ${BUNDLE_PLAN.quarterlyPrice} billed every 3 months
-                </p>
               </div>
               <Link
                 href="/login"
@@ -121,14 +111,7 @@ export default function PricingPage() {
               >
                 Start your free trial
               </Link>
-              <a
-                href={PATREON_JOIN_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="rounded-full bg-brand px-6 py-3 text-sm font-semibold text-white transition hover:bg-brand-hover"
-              >
-                Subscribe on Patreon
-              </a>
+              <PatreonBuyButton className="rounded-full bg-brand px-6 py-3 text-sm font-semibold text-white transition hover:bg-brand-hover" />
             </div>
           </div>
         </div>
@@ -182,14 +165,10 @@ export default function PricingPage() {
               >
                 Create account
               </Link>
-              <a
-                href={PATREON_JOIN_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="mt-2 rounded-full bg-brand px-4 py-2 text-center text-sm font-semibold text-white transition hover:bg-brand-hover"
-              >
-                Subscribe on Patreon
-              </a>
+              <PatreonBuyButton
+                wrapperClassName="mt-2"
+                className="w-full rounded-full bg-brand px-4 py-2 text-center text-sm font-semibold text-white transition hover:bg-brand-hover"
+              />
             </div>
           ))}
         </div>
@@ -227,14 +206,7 @@ export default function PricingPage() {
               >
                 Create account
               </Link>
-              <a
-                href={PATREON_JOIN_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="rounded-full bg-brand px-6 py-3 text-sm font-semibold text-white transition hover:bg-brand-hover"
-              >
-                Subscribe on Patreon
-              </a>
+              <PatreonBuyButton className="rounded-full bg-brand px-6 py-3 text-sm font-semibold text-white transition hover:bg-brand-hover" />
             </div>
           </div>
         </div>
