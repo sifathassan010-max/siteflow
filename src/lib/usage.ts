@@ -49,6 +49,26 @@ export async function checkUsageLimit(userId: string, tool: string): Promise<Usa
   } as const;
 }
 
+// Lighter-weight check than checkUsageLimit() for spots that just need a
+// yes/no ("does this account get the paid version of this tool?") rather
+// than trial usage numbers — e.g. gating how many custom chatbot queries
+// someone can save. Anonymous/no-account callers should treat this as
+// false rather than calling it.
+export async function isPaidForTool(userId: string, tool: string): Promise<boolean> {
+  const supabase = createAdminClient();
+
+  const { data: subscription } = await supabase
+    .from("subscriptions")
+    .select("status, unlocked_tools")
+    .eq("user_id", userId)
+    .single();
+
+  return (
+    subscription?.status === "active" &&
+    (subscription.unlocked_tools ?? []).includes(tool)
+  );
+}
+
 export async function logUsage(
   userId: string,
   tool: string,
