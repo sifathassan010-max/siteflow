@@ -1,5 +1,5 @@
+import Link from "next/link";
 import { checkUsageLimit } from "@/lib/usage";
-import { PATREON_JOIN_URL } from "@/lib/patreon-config";
 
 const UNIT_LABEL: Record<string, string> = {
   chatbot: "messages",
@@ -10,7 +10,7 @@ const UNIT_LABEL: Record<string, string> = {
 
 // Drop this at the top of any paid tool's main page.tsx (right under the
 // intro paragraph). Shows nothing for paid/active subscribers. Shows a
-// trial progress bar + Patreon link for everyone else, so people see
+// trial progress bar + pricing link for everyone else, so people see
 // they're approaching the wall before they hit it, not just after.
 export default async function UsageBanner({
   userId,
@@ -35,14 +35,9 @@ export default async function UsageBanner({
         <p className="font-semibold">
           Free trial: {used}/{limit} {unit} used
         </p>
-        <a
-          href={PATREON_JOIN_URL}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="font-semibold text-brand hover:underline"
-        >
-          Subscribe on Patreon →
-        </a>
+        <Link href="/pricing" className="font-semibold text-brand hover:underline">
+          See the Pricing →
+        </Link>
       </div>
       <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-canvas">
         <div
