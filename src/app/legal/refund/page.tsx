@@ -39,13 +39,13 @@ export default function RefundPage() {
           </section>
 
           <section>
-            <h2 className="text-lg font-bold">2. 14-day money-back guarantee</h2>
+            <h2 className="text-lg font-bold">2. 7-day money-back guarantee</h2>
             <p className="mt-3">
               If you're not happy with a paid tool, email{" "}
               <a href={`mailto:${SUPPORT_EMAIL}`} className="text-brand underline">
                 {SUPPORT_EMAIL}
               </a>{" "}
-              within 14 days of your first charge for that subscription, with the email address on
+              within 7 days of your first charge for that subscription, with the email address on
               your account and the date of the charge, and we'll refund that charge in full — no
               detailed explanation required. This guarantee applies once per subscription's first
               billing cycle; it isn't a rolling refund window for every renewal charge.
@@ -55,7 +55,7 @@ export default function RefundPage() {
           <section>
             <h2 className="text-lg font-bold">3. Other refund requests</h2>
             <p className="mt-3">
-              Outside the 14-day window described above, if something goes wrong — for example,
+              Outside the 7-day window described above, if something goes wrong — for example,
               you were charged in error, charged after cancelling, or a tool you paid for didn't
               work as described — contact us at{" "}
               <a href={`mailto:${SUPPORT_EMAIL}`} className="text-brand underline">
