@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import type { CustomQuery } from "@/lib/chatbot-custom-queries";
 
 type Message = { role: "user" | "assistant"; content: string };
 
@@ -11,6 +12,7 @@ export default function EmbedChatWidget({
   widgetColor,
   logoUrl,
   escalationContact,
+  customQueries = [],
 }: {
   botId: string;
   botName: string;
@@ -18,7 +20,9 @@ export default function EmbedChatWidget({
   widgetColor: string;
   logoUrl: string | null;
   escalationContact: string | null;
+  customQueries?: CustomQuery[];
 }) {
+  const [expandedQueryIndex, setExpandedQueryIndex] = useState<number | null>(null);
   const [messages, setMessages] = useState<Message[]>([
     { role: "assistant", content: `Hi! I'm ${botName}. How can I help?` },
   ]);
@@ -111,6 +115,7 @@ export default function EmbedChatWidget({
   // Quick Prompts only make sense before the visitor has said anything —
   // once they're mid-conversation the buttons would just get in the way.
   const showQuickPrompts = quickPrompts.length > 0 && messages.length === 1 && !loading;
+  const showCustomQueries = customQueries.length > 0 && messages.length === 1 && !loading;
 
   return (
     <div className="flex h-full flex-col">
@@ -200,6 +205,32 @@ export default function EmbedChatWidget({
                     {prompt}
                   </button>
                 ))}
+              </div>
+            )}
+
+            {showCustomQueries && (
+              <div className="flex flex-col gap-2 pt-3">
+                <p className="text-xs font-semibold text-slate">Common questions</p>
+                {customQueries.map((q, i) => {
+                  const isExpanded = expandedQueryIndex === i;
+                  return (
+                    <div key={i} className="overflow-hidden rounded-lg border border-line">
+                      <button
+                        type="button"
+                        onClick={() => setExpandedQueryIndex(isExpanded ? null : i)}
+                        style={{ color: q.color }}
+                        className="w-full px-3 py-2 text-left text-sm font-semibold"
+                      >
+                        {q.question}
+                      </button>
+                      {isExpanded && q.description && (
+                        <p className="whitespace-pre-wrap border-t border-line bg-canvas px-3 py-2 text-sm text-ink">
+                          {q.description}
+                        </p>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
             )}
           </div>
