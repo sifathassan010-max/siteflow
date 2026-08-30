@@ -1,5 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { NextResponse } from "next/server";
+import { isPaidForTool } from "@/lib/usage";
+import { sanitizeCustomQueries } from "@/lib/chatbot-custom-queries";
 
 // Groq models available to pick between in the widget appearance/settings
 // form. Keep this list short and validate against it server-side so a bad
@@ -23,7 +25,7 @@ export async function GET(
   const { data: bot, error } = await supabase
     .from("bots")
     .select(
-      "id, name, persona, website_url, quick_prompts, widget_color, logo_url, escalation_contact, model, trained_pages, last_trained_at, created_at"
+      "id, name, persona, website_url, quick_prompts, widget_color, logo_url, escalation_contact, model, custom_queries, trained_pages, last_trained_at, created_at"
     )
     .eq("id", id)
     .eq("user_id", user.id)
@@ -36,7 +38,9 @@ export async function GET(
     return NextResponse.json({ error: "Bot not found" }, { status: 404 });
   }
 
-  return NextResponse.json({ bot });
+  const isPaid = await isPaidForTool(user.id, "chatbot");
+
+  return NextResponse.json({ bot, isPaid });
 }
 
 export async function PATCH(
@@ -97,6 +101,11 @@ export async function PATCH(
     update.model = body.model;
   }
 
+  if (Array.isArray(body.custom_queries)) {
+    const isPaid = await isPaidForTool(user.id, "chatbot");
+    update.custom_queries = sanitizeCustomQueries(body.custom_queries, isPaid);
+  }
+
   if (Object.keys(update).length === 0) {
     return NextResponse.json({ error: "Nothing to update" }, { status: 400 });
   }
@@ -107,7 +116,7 @@ export async function PATCH(
     .eq("id", id)
     .eq("user_id", user.id)
     .select(
-      "id, name, persona, website_url, quick_prompts, widget_color, logo_url, escalation_contact, model, trained_pages, last_trained_at, created_at"
+      "id, name, persona, website_url, quick_prompts, widget_color, logo_url, escalation_contact, model, custom_queries, trained_pages, last_trained_at, created_at"
     )
     .single();
 

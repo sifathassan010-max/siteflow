@@ -1,6 +1,8 @@
 import { createClient } from "@/lib/supabase/server";
 import { NextResponse } from "next/server";
 import { crawlSiteForTraining } from "@/lib/site-crawler";
+import { isPaidForTool } from "@/lib/usage";
+import { sanitizeCustomQueries } from "@/lib/chatbot-custom-queries";
 
 // Multi-page crawling can take a while — give this route more room than
 // the default 10s (Vercel Hobby plan supports up to 60s via maxDuration).
@@ -50,7 +52,12 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Not logged in" }, { status: 401 });
   }
 
-  const { name, persona, website_url: websiteUrl } = await request.json();
+  const {
+    name,
+    persona,
+    website_url: websiteUrl,
+    custom_queries: customQueriesInput,
+  } = await request.json();
 
   if (!name || typeof name !== "string" || !name.trim()) {
     return NextResponse.json({ error: "Bot name is required" }, { status: 400 });
@@ -67,6 +74,9 @@ export async function POST(request: Request) {
       { status: 400 }
     );
   }
+
+  const isPaid = await isPaidForTool(user.id, "chatbot");
+  const customQueries = sanitizeCustomQueries(customQueriesInput, isPaid);
 
   let siteContent: string | null = null;
   let trainedPages: { url: string; chars: number }[] = [];
@@ -94,8 +104,9 @@ export async function POST(request: Request) {
       site_content: siteContent,
       trained_pages: trainedPages,
       last_trained_at: siteContent ? new Date().toISOString() : null,
+      custom_queries: customQueries,
     })
-    .select("id, name, persona, website_url, created_at")
+    .select("id, name, persona, website_url, custom_queries, created_at")
     .single();
 
   if (error) {
