@@ -4,7 +4,14 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { redirectToLoginIfUnauthorized } from "@/lib/auth-redirect";
 import CustomQueryEditor from "./custom-query-editor";
+import BotAvatarEditor from "./bot-avatar-editor";
+import WidgetPositionPicker from "./widget-position-picker";
 import { emptyCustomQuery, type CustomQuery } from "@/lib/chatbot-custom-queries";
+import { emptyAvatarConfig, type BotAvatarConfig } from "@/lib/chatbot-bot-avatars";
+import {
+  DEFAULT_WIDGET_POSITION,
+  type WidgetPosition,
+} from "@/lib/chatbot-widget-position";
 
 export default function NewBotForm({ isPaid = false }: { isPaid?: boolean }) {
   const router = useRouter();
@@ -12,6 +19,10 @@ export default function NewBotForm({ isPaid = false }: { isPaid?: boolean }) {
   const [persona, setPersona] = useState("");
   const [websiteUrl, setWebsiteUrl] = useState("");
   const [customQueries, setCustomQueries] = useState<CustomQuery[]>([emptyCustomQuery()]);
+  const [avatarConfig, setAvatarConfig] = useState<BotAvatarConfig>(emptyAvatarConfig());
+  const [widgetPosition, setWidgetPosition] = useState<WidgetPosition>(
+    DEFAULT_WIDGET_POSITION
+  );
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -29,6 +40,8 @@ export default function NewBotForm({ isPaid = false }: { isPaid?: boolean }) {
           persona,
           website_url: websiteUrl,
           custom_queries: customQueries,
+          avatar_config: avatarConfig,
+          widget_position: widgetPosition,
         }),
       });
       const data = await res.json();
@@ -103,6 +116,15 @@ export default function NewBotForm({ isPaid = false }: { isPaid?: boolean }) {
         onChange={setCustomQueries}
         isPaid={isPaid}
       />
+
+      <BotAvatarEditor
+        config={avatarConfig}
+        onChange={setAvatarConfig}
+        isPaid={isPaid}
+        botName={name}
+      />
+
+      <WidgetPositionPicker value={widgetPosition} onChange={setWidgetPosition} />
 
       {error && <p className="text-sm text-red-600">{error}</p>}
 

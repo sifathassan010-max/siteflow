@@ -4,7 +4,14 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import CustomQueryEditor from "../../custom-query-editor";
+import BotAvatarEditor from "../../bot-avatar-editor";
+import WidgetPositionPicker from "../../widget-position-picker";
 import { emptyCustomQuery, type CustomQuery } from "@/lib/chatbot-custom-queries";
+import { emptyAvatarConfig, type BotAvatarConfig } from "@/lib/chatbot-bot-avatars";
+import {
+  DEFAULT_WIDGET_POSITION,
+  type WidgetPosition,
+} from "@/lib/chatbot-widget-position";
 
 type Bot = {
   id: string;
@@ -17,6 +24,8 @@ type Bot = {
   escalation_contact: string | null;
   model: string;
   custom_queries: CustomQuery[];
+  avatar_config: BotAvatarConfig;
+  widget_position: WidgetPosition;
   trained_pages: { url: string; chars: number }[];
   last_trained_at: string | null;
 };
@@ -43,6 +52,12 @@ export default function BotSettingsForm({
   const [model, setModel] = useState(bot.model);
   const [customQueries, setCustomQueries] = useState<CustomQuery[]>(
     bot.custom_queries.length > 0 ? bot.custom_queries : [emptyCustomQuery()]
+  );
+  const [avatarConfig, setAvatarConfig] = useState<BotAvatarConfig>(
+    bot.avatar_config ?? emptyAvatarConfig()
+  );
+  const [widgetPosition, setWidgetPosition] = useState<WidgetPosition>(
+    bot.widget_position ?? DEFAULT_WIDGET_POSITION
   );
 
   const [saving, setSaving] = useState(false);
@@ -75,6 +90,8 @@ export default function BotSettingsForm({
           escalation_contact: escalationContact,
           model,
           custom_queries: customQueries,
+          avatar_config: avatarConfig,
+          widget_position: widgetPosition,
         }),
       });
       const data = await res.json();
@@ -205,6 +222,15 @@ export default function BotSettingsForm({
           onChange={setCustomQueries}
           isPaid={isPaid}
         />
+
+        <BotAvatarEditor
+          config={avatarConfig}
+          onChange={setAvatarConfig}
+          isPaid={isPaid}
+          botName={bot.name}
+        />
+
+        <WidgetPositionPicker value={widgetPosition} onChange={setWidgetPosition} />
 
         {saveError && <p className="text-sm text-red-600">{saveError}</p>}
 

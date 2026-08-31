@@ -21,7 +21,7 @@ export default async function BotSettingsPage({
     supabase
       .from("bots")
       .select(
-        "id, name, persona, website_url, quick_prompts, widget_color, logo_url, escalation_contact, model, custom_queries, trained_pages, last_trained_at"
+        "id, name, persona, website_url, quick_prompts, widget_color, logo_url, escalation_contact, model, custom_queries, avatar_config, widget_position, trained_pages, last_trained_at"
       )
       .eq("id", id)
       .eq("user_id", user.id)

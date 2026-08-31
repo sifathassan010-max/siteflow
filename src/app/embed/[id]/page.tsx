@@ -15,7 +15,7 @@ export default async function EmbedPage({
   const { data: bot } = await admin
     .from("bots")
     .select(
-      "id, name, quick_prompts, widget_color, logo_url, escalation_contact, custom_queries"
+      "id, name, quick_prompts, widget_color, logo_url, escalation_contact, custom_queries, avatar_config"
     )
     .eq("id", id)
     .maybeSingle();
@@ -38,6 +38,7 @@ export default async function EmbedPage({
         logoUrl={bot.logo_url}
         escalationContact={bot.escalation_contact}
         customQueries={bot.custom_queries ?? []}
+        avatarConfig={bot.avatar_config ?? null}
       />
     </div>
   );
