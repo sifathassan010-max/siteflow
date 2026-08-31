@@ -2,6 +2,8 @@ import { createClient } from "@/lib/supabase/server";
 import { NextResponse } from "next/server";
 import { isPaidForTool } from "@/lib/usage";
 import { sanitizeCustomQueries } from "@/lib/chatbot-custom-queries";
+import { sanitizeBotAvatarConfig } from "@/lib/chatbot-bot-avatars";
+import { sanitizeWidgetPosition } from "@/lib/chatbot-widget-position";
 
 // Groq models available to pick between in the widget appearance/settings
 // form. Keep this list short and validate against it server-side so a bad
@@ -25,7 +27,7 @@ export async function GET(
   const { data: bot, error } = await supabase
     .from("bots")
     .select(
-      "id, name, persona, website_url, quick_prompts, widget_color, logo_url, escalation_contact, model, custom_queries, trained_pages, last_trained_at, created_at"
+      "id, name, persona, website_url, quick_prompts, widget_color, logo_url, escalation_contact, model, custom_queries, avatar_config, widget_position, trained_pages, last_trained_at, created_at"
     )
     .eq("id", id)
     .eq("user_id", user.id)
@@ -101,9 +103,18 @@ export async function PATCH(
     update.model = body.model;
   }
 
-  if (Array.isArray(body.custom_queries)) {
+  if (typeof body.widget_position === "string") {
+    update.widget_position = sanitizeWidgetPosition(body.widget_position);
+  }
+
+  if (Array.isArray(body.custom_queries) || (typeof body.avatar_config === "object" && body.avatar_config !== null)) {
     const isPaid = await isPaidForTool(user.id, "chatbot");
-    update.custom_queries = sanitizeCustomQueries(body.custom_queries, isPaid);
+    if (Array.isArray(body.custom_queries)) {
+      update.custom_queries = sanitizeCustomQueries(body.custom_queries, isPaid);
+    }
+    if (typeof body.avatar_config === "object" && body.avatar_config !== null) {
+      update.avatar_config = sanitizeBotAvatarConfig(body.avatar_config, isPaid);
+    }
   }
 
   if (Object.keys(update).length === 0) {
@@ -116,7 +127,7 @@ export async function PATCH(
     .eq("id", id)
     .eq("user_id", user.id)
     .select(
-      "id, name, persona, website_url, quick_prompts, widget_color, logo_url, escalation_contact, model, custom_queries, trained_pages, last_trained_at, created_at"
+      "id, name, persona, website_url, quick_prompts, widget_color, logo_url, escalation_contact, model, custom_queries, avatar_config, widget_position, trained_pages, last_trained_at, created_at"
     )
     .single();
 

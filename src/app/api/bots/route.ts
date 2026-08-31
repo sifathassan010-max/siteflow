@@ -3,6 +3,8 @@ import { NextResponse } from "next/server";
 import { crawlSiteForTraining } from "@/lib/site-crawler";
 import { isPaidForTool } from "@/lib/usage";
 import { sanitizeCustomQueries } from "@/lib/chatbot-custom-queries";
+import { sanitizeBotAvatarConfig } from "@/lib/chatbot-bot-avatars";
+import { sanitizeWidgetPosition } from "@/lib/chatbot-widget-position";
 
 // Multi-page crawling can take a while — give this route more room than
 // the default 10s (Vercel Hobby plan supports up to 60s via maxDuration).
@@ -57,6 +59,8 @@ export async function POST(request: Request) {
     persona,
     website_url: websiteUrl,
     custom_queries: customQueriesInput,
+    avatar_config: avatarConfigInput,
+    widget_position: widgetPositionInput,
   } = await request.json();
 
   if (!name || typeof name !== "string" || !name.trim()) {
@@ -77,6 +81,8 @@ export async function POST(request: Request) {
 
   const isPaid = await isPaidForTool(user.id, "chatbot");
   const customQueries = sanitizeCustomQueries(customQueriesInput, isPaid);
+  const avatarConfig = sanitizeBotAvatarConfig(avatarConfigInput, isPaid);
+  const widgetPosition = sanitizeWidgetPosition(widgetPositionInput);
 
   let siteContent: string | null = null;
   let trainedPages: { url: string; chars: number }[] = [];
@@ -105,8 +111,10 @@ export async function POST(request: Request) {
       trained_pages: trainedPages,
       last_trained_at: siteContent ? new Date().toISOString() : null,
       custom_queries: customQueries,
+      avatar_config: avatarConfig,
+      widget_position: widgetPosition,
     })
-    .select("id, name, persona, website_url, custom_queries, created_at")
+    .select("id, name, persona, website_url, custom_queries, avatar_config, widget_position, created_at")
     .single();
 
   if (error) {
