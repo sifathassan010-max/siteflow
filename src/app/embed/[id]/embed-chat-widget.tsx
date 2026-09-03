@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect, useMemo } from "react";
 import type { CustomQuery } from "@/lib/chatbot-custom-queries";
 import { AVATAR_MIN_SIZE, type BotAvatarConfig } from "@/lib/chatbot-bot-avatars";
+import { SITE_URL } from "@/lib/site-url";
 
 type Message = { role: "user" | "assistant"; content: string };
 
@@ -151,6 +152,20 @@ export default function EmbedChatWidget({
 
   return (
     <div className="flex h-full flex-col">
+      {/* Attribution bar — pinned above the header, never scrolls away with
+          the messages. Shown for every bot, free or paid. */}
+      <div className="flex shrink-0 items-center justify-center border-b border-line bg-canvas px-2 py-1">
+        <a
+          href={SITE_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="truncate text-[10px] leading-tight tracking-tight hover:underline"
+        >
+          <span className="text-[#2563eb]">This AI assistant is powered by </span>
+          <span className="font-semibold text-brand">SiteFlow</span>
+        </a>
+      </div>
+
       <div className="flex items-center justify-between border-b border-line px-4 py-3">
         <div className="flex items-center gap-2">
           {hasAvatar && activeAvatar && !avatarMinimized ? (
