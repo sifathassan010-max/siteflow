@@ -15,13 +15,15 @@ export async function POST(request: Request) {
   const auth = await authenticateApiRequest(request);
   if (!auth.ok) return auth.response;
 
-  const usage = await checkApiUsageLimit(auth.userId, "chatbot");
+  const usage = await checkApiUsageLimit(auth.userId, "chatbot", auth.scopes);
   if (!usage.allowed) {
     const message =
       usage.reason === "no_plan"
         ? "This API key's account doesn't have an active Chatbot API plan. Subscribe at siteflow-omega.vercel.app/pricing."
+        : usage.reason === "key_not_scoped"
+        ? "This API key isn't scoped for the Chatbot API. Create a new key with that scope, or use an unscoped key."
         : `Monthly quota exceeded (${usage.used}/${usage.limit} calls this month). Resets at the start of next month.`;
-    return NextResponse.json({ error: message }, { status: 402 });
+    return NextResponse.json({ error: message }, { status: usage.reason === "key_not_scoped" ? 403 : 402 });
   }
 
   let body: { botId?: string; message?: string };

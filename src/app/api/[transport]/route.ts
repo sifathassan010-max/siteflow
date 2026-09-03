@@ -25,12 +25,16 @@ const TOOL_LABEL: Record<ApiTool, string> = {
 };
 
 function quotaMessage(
-  usage: { reason?: "no_plan" | "quota_exceeded"; used: number; limit: number },
+  usage: { reason?: "no_plan" | "quota_exceeded" | "key_not_scoped"; used: number; limit: number },
   tool: ApiTool
 ) {
-  return usage.reason === "no_plan"
-    ? `This API key's account doesn't have an active ${TOOL_LABEL[tool]} API plan. Subscribe at siteflow-omega.vercel.app/pricing.`
-    : `Monthly quota exceeded (${usage.used}/${usage.limit} calls this month). Resets at the start of next month.`;
+  if (usage.reason === "no_plan") {
+    return `This API key's account doesn't have an active ${TOOL_LABEL[tool]} API plan. Subscribe at siteflow-omega.vercel.app/pricing.`;
+  }
+  if (usage.reason === "key_not_scoped") {
+    return `This API key isn't scoped for the ${TOOL_LABEL[tool]} API. Create a new key with that scope, or use an unscoped key.`;
+  }
+  return `Monthly quota exceeded (${usage.used}/${usage.limit} calls this month). Resets at the start of next month.`;
 }
 
 function textResult(payload: unknown) {
@@ -49,6 +53,13 @@ function requireUserId(extra: { authInfo?: { extra?: Record<string, unknown> } }
   return typeof userId === "string" ? userId : null;
 }
 
+// Scopes for the key that authenticated this call — [] means unscoped
+// (inherits every tool active on the account), matching src/lib/api-auth.ts.
+function requireScopes(extra: { authInfo?: { extra?: Record<string, unknown> } }): ApiTool[] {
+  const scopes = extra.authInfo?.extra?.scopes;
+  return Array.isArray(scopes) ? (scopes as ApiTool[]) : [];
+}
+
 const handler = createMcpHandler(
   (server) => {
     server.tool(
@@ -59,7 +70,8 @@ const handler = createMcpHandler(
         const userId = requireUserId(extra);
         if (!userId) return errorResult("Not authenticated.");
 
-        const usage = await checkApiUsageLimit(userId, "seo");
+        const scopes = requireScopes(extra);
+        const usage = await checkApiUsageLimit(userId, "seo", scopes);
         if (!usage.allowed) return errorResult(quotaMessage(usage, "seo"));
 
         let target: URL;
@@ -109,7 +121,8 @@ const handler = createMcpHandler(
         const userId = requireUserId(extra);
         if (!userId) return errorResult("Not authenticated.");
 
-        const usage = await checkApiUsageLimit(userId, "analytics");
+        const scopes = requireScopes(extra);
+        const usage = await checkApiUsageLimit(userId, "analytics", scopes);
         if (!usage.allowed) return errorResult(quotaMessage(usage, "analytics"));
 
         const windowDays = days ?? 7;
@@ -175,7 +188,8 @@ const handler = createMcpHandler(
         const userId = requireUserId(extra);
         if (!userId) return errorResult("Not authenticated.");
 
-        const usage = await checkApiUsageLimit(userId, "forms");
+        const scopes = requireScopes(extra);
+        const usage = await checkApiUsageLimit(userId, "forms", scopes);
         if (!usage.allowed) return errorResult(quotaMessage(usage, "forms"));
 
         const admin = createAdminClient();
@@ -219,7 +233,8 @@ const handler = createMcpHandler(
         const userId = requireUserId(extra);
         if (!userId) return errorResult("Not authenticated.");
 
-        const usage = await checkApiUsageLimit(userId, "chatbot");
+        const scopes = requireScopes(extra);
+        const usage = await checkApiUsageLimit(userId, "chatbot", scopes);
         if (!usage.allowed) return errorResult(quotaMessage(usage, "chatbot"));
 
         const admin = createAdminClient();
@@ -298,7 +313,7 @@ const verifyToken = async (_req: Request, bearerToken?: string) => {
     token: bearerToken,
     clientId: verified.userId,
     scopes: [],
-    extra: { userId: verified.userId, keyId: verified.keyId },
+    extra: { userId: verified.userId, keyId: verified.keyId, scopes: verified.scopes },
   };
 };
 

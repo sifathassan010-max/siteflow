@@ -16,13 +16,15 @@ export async function GET(request: Request) {
   const auth = await authenticateApiRequest(request);
   if (!auth.ok) return auth.response;
 
-  const usage = await checkApiUsageLimit(auth.userId, "analytics");
+  const usage = await checkApiUsageLimit(auth.userId, "analytics", auth.scopes);
   if (!usage.allowed) {
     const message =
       usage.reason === "no_plan"
         ? "This API key's account doesn't have an active Analytics API plan. Subscribe at siteflow-omega.vercel.app/pricing."
+        : usage.reason === "key_not_scoped"
+        ? "This API key isn't scoped for the Analytics API. Create a new key with that scope, or use an unscoped key."
         : `Monthly quota exceeded (${usage.used}/${usage.limit} calls this month). Resets at the start of next month.`;
-    return NextResponse.json({ error: message }, { status: 402 });
+    return NextResponse.json({ error: message }, { status: usage.reason === "key_not_scoped" ? 403 : 402 });
   }
 
   const { searchParams } = new URL(request.url);
