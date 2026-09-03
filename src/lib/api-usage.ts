@@ -24,9 +24,23 @@ function startOfCurrentMonthIso(): string {
 
 export type ApiUsageCheck =
   | { allowed: true; used: number; limit: number }
-  | { allowed: false; used: number; limit: number; reason: "no_plan" | "quota_exceeded" };
+  | { allowed: false; used: number; limit: number; reason: "no_plan" | "quota_exceeded" | "key_not_scoped" };
 
-export async function checkApiUsageLimit(userId: string, tool: ApiTool): Promise<ApiUsageCheck> {
+// `keyScopes` comes from the API key that authenticated this request
+// (see src/lib/api-auth.ts). An empty array means the key is unscoped —
+// it inherits whatever tools are active on the account, same as before
+// key scoping existed. A non-empty array restricts THIS key to those
+// tools specifically, even if the account itself has more tools active
+// (e.g. a "chatbot only" key on an All-Access-API account).
+export async function checkApiUsageLimit(
+  userId: string,
+  tool: ApiTool,
+  keyScopes: ApiTool[] = []
+): Promise<ApiUsageCheck> {
+  if (keyScopes.length > 0 && !keyScopes.includes(tool)) {
+    return { allowed: false, used: 0, limit: 0, reason: "key_not_scoped" };
+  }
+
   const admin = createAdminClient();
 
   const { data: subscription } = await admin

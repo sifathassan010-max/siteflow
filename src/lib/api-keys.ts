@@ -3,6 +3,7 @@
 // session used by the dashboard — an external agent has no browser
 // cookie, so it authenticates with a bearer key instead.
 import { createAdminClient } from "@/lib/supabase/admin";
+import { API_TOOLS, type ApiTool } from "@/lib/api-usage";
 import crypto from "crypto";
 
 const KEY_PREFIX = "sk_live_";
@@ -11,10 +12,18 @@ function hashKey(rawKey: string): string {
   return crypto.createHash("sha256").update(rawKey).digest("hex");
 }
 
+// Keeps only recognized tool names, in a stable order. An empty result
+// means "unscoped" — the key inherits every tool the account has active,
+// same as before scoping existed.
+function sanitizeScopes(raw: unknown): ApiTool[] {
+  if (!Array.isArray(raw)) return [];
+  return API_TOOLS.filter((tool) => raw.includes(tool));
+}
+
 // Generates a new raw key, stores only its hash, and returns the raw key —
 // this is the ONLY moment the raw key is ever available. Callers must show
 // it to the user immediately and never persist it themselves.
-export async function createApiKey(userId: string, name = "Default key") {
+export async function createApiKey(userId: string, name = "Default key", scopes: unknown = []) {
   const raw = KEY_PREFIX + crypto.randomBytes(24).toString("hex");
   const admin = createAdminClient();
 
@@ -25,8 +34,9 @@ export async function createApiKey(userId: string, name = "Default key") {
       key_hash: hashKey(raw),
       key_prefix: raw.slice(0, 12),
       name,
+      scopes: sanitizeScopes(scopes),
     })
-    .select("id, key_prefix, created_at")
+    .select("id, key_prefix, scopes, created_at")
     .single();
 
   if (error) throw error;
@@ -35,14 +45,18 @@ export async function createApiKey(userId: string, name = "Default key") {
 }
 
 // Looks up which user a raw key belongs to, and updates last_used_at.
-// Returns null for a missing, malformed, or revoked key.
-export async function verifyApiKey(rawKey: string): Promise<{ userId: string; keyId: string } | null> {
+// Returns null for a missing, malformed, or revoked key. `scopes` is `[]`
+// for an unscoped key (full access to the account's active tools) or the
+// specific tools this key is limited to.
+export async function verifyApiKey(
+  rawKey: string
+): Promise<{ userId: string; keyId: string; scopes: ApiTool[] } | null> {
   if (!rawKey || !rawKey.startsWith(KEY_PREFIX)) return null;
 
   const admin = createAdminClient();
   const { data: key } = await admin
     .from("api_keys")
-    .select("id, user_id, revoked_at")
+    .select("id, user_id, revoked_at, scopes")
     .eq("key_hash", hashKey(rawKey))
     .maybeSingle();
 
@@ -55,7 +69,11 @@ export async function verifyApiKey(rawKey: string): Promise<{ userId: string; ke
     .eq("id", key.id)
     .then(() => {});
 
-  return { userId: key.user_id as string, keyId: key.id as string };
+  return {
+    userId: key.user_id as string,
+    keyId: key.id as string,
+    scopes: sanitizeScopes(key.scopes),
+  };
 }
 
 export async function revokeApiKey(userId: string, keyId: string) {

@@ -1,9 +1,10 @@
 // Server-only. Every route under src/app/api/v1/** calls this first.
 import { verifyApiKey } from "@/lib/api-keys";
+import type { ApiTool } from "@/lib/api-usage";
 import { NextResponse } from "next/server";
 
 export type ApiAuthResult =
-  | { ok: true; userId: string; keyId: string }
+  | { ok: true; userId: string; keyId: string; scopes: ApiTool[] }
   | { ok: false; response: NextResponse };
 
 // Reads "Authorization: Bearer sk_live_..." and resolves it to a user id.
@@ -31,5 +32,5 @@ export async function authenticateApiRequest(request: Request): Promise<ApiAuthR
     };
   }
 
-  return { ok: true, userId: verified.userId, keyId: verified.keyId };
+  return { ok: true, userId: verified.userId, keyId: verified.keyId, scopes: verified.scopes };
 }
