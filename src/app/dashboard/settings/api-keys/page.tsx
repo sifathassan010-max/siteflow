@@ -16,8 +16,9 @@ export default async function ApiKeysPage() {
       <p className="mt-2 max-w-xl text-slate">
         Use an API key to call SiteFlow&apos;s tools programmatically — for a
         script, backend, or AI agent — instead of through the dashboard.
-        Each key inherits whichever API plans are active on this account.
-        See the{" "}
+        By default a key inherits every API plan active on this account,
+        or you can scope a key to just one or a few tools when you create
+        it. See the{" "}
         <a href="/api-docs" className="text-brand underline">
           API docs
         </a>{" "}

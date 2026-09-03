@@ -6,6 +6,7 @@ type ApiKey = {
   id: string;
   key_prefix: string;
   name: string;
+  scopes: string[];
   last_used_at: string | null;
   revoked_at: string | null;
   created_at: string;
@@ -26,6 +27,13 @@ const TOOL_LABELS: Record<keyof UsageSummary, string> = {
   analytics: "Analytics API",
 };
 
+const ALL_TOOLS = Object.keys(TOOL_LABELS) as (keyof UsageSummary)[];
+
+function scopeLabel(scopes: string[]) {
+  if (scopes.length === 0) return "All unlocked APIs";
+  return scopes.map((s) => TOOL_LABELS[s as keyof UsageSummary] ?? s).join(", ");
+}
+
 function formatDate(iso: string | null) {
   if (!iso) return "Never";
   return new Date(iso).toLocaleDateString(undefined, {
@@ -42,6 +50,10 @@ export default function ApiKeysClient() {
   const [error, setError] = useState("");
   const [creating, setCreating] = useState(false);
   const [newRawKey, setNewRawKey] = useState<string | null>(null);
+  const [showForm, setShowForm] = useState(false);
+  const [keyName, setKeyName] = useState("");
+  const [scopeMode, setScopeMode] = useState<"all" | "specific">("all");
+  const [selectedScopes, setSelectedScopes] = useState<string[]>([]);
 
   const load = useCallback(() => {
     setLoading(true);
@@ -81,9 +93,19 @@ export default function ApiKeysClient() {
   }, []);
 
   async function handleCreate() {
+    if (scopeMode === "specific" && selectedScopes.length === 0) {
+      setError("Pick at least one API for this key, or choose \"All unlocked APIs\".");
+      return;
+    }
     setCreating(true);
     setError("");
-    const res = await fetch("/api/keys", { method: "POST", body: JSON.stringify({}) });
+    const res = await fetch("/api/keys", {
+      method: "POST",
+      body: JSON.stringify({
+        name: keyName.trim() || undefined,
+        scopes: scopeMode === "specific" ? selectedScopes : [],
+      }),
+    });
     const data = await res.json();
     setCreating(false);
     if (!res.ok) {
@@ -91,7 +113,17 @@ export default function ApiKeysClient() {
       return;
     }
     setNewRawKey(data.key.rawKey);
+    setShowForm(false);
+    setKeyName("");
+    setScopeMode("all");
+    setSelectedScopes([]);
     load();
+  }
+
+  function toggleScope(tool: string) {
+    setSelectedScopes((prev) =>
+      prev.includes(tool) ? prev.filter((t) => t !== tool) : [...prev, tool]
+    );
   }
 
   async function handleRevoke(id: string) {
@@ -141,13 +173,78 @@ export default function ApiKeysClient() {
         <div className="flex items-center justify-between">
           <h2 className="text-sm font-semibold text-ink">Your API keys</h2>
           <button
-            onClick={handleCreate}
-            disabled={creating}
-            className="rounded-lg bg-brand px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-brand-hover disabled:opacity-50"
+            onClick={() => setShowForm((v) => !v)}
+            className="rounded-lg bg-brand px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-brand-hover"
           >
-            {creating ? "Creating…" : "Create new key"}
+            {showForm ? "Cancel" : "Create new key"}
           </button>
         </div>
+
+        {showForm && (
+          <div className="mt-4 rounded-lg border border-line bg-canvas p-4">
+            <label className="text-xs font-semibold text-ink">Key name (optional)</label>
+            <input
+              type="text"
+              value={keyName}
+              onChange={(e) => setKeyName(e.target.value)}
+              placeholder="e.g. Zapier integration"
+              className="mt-1 w-full rounded-lg border border-line px-3 py-2 text-sm"
+            />
+
+            <p className="mt-4 text-xs font-semibold text-ink">Which APIs can this key call?</p>
+            <div className="mt-2 flex flex-col gap-2">
+              <label className="flex items-center gap-2 text-sm text-ink">
+                <input
+                  type="radio"
+                  checked={scopeMode === "all"}
+                  onChange={() => setScopeMode("all")}
+                />
+                All unlocked APIs — inherits whatever plans are active on this account, including any added later
+              </label>
+              <label className="flex items-center gap-2 text-sm text-ink">
+                <input
+                  type="radio"
+                  checked={scopeMode === "specific"}
+                  onChange={() => setScopeMode("specific")}
+                />
+                Only specific APIs
+              </label>
+            </div>
+
+            {scopeMode === "specific" && (
+              <div className="mt-3 ml-6 flex flex-col gap-2">
+                {ALL_TOOLS.map((tool) => {
+                  const unlocked = usage?.[tool]?.unlocked ?? false;
+                  return (
+                    <label
+                      key={tool}
+                      className={`flex items-center gap-2 text-sm ${
+                        unlocked ? "text-ink" : "cursor-not-allowed text-slate/50"
+                      }`}
+                    >
+                      <input
+                        type="checkbox"
+                        disabled={!unlocked}
+                        checked={selectedScopes.includes(tool)}
+                        onChange={() => toggleScope(tool)}
+                      />
+                      {TOOL_LABELS[tool]}
+                      {!unlocked && <span className="text-xs">(not subscribed)</span>}
+                    </label>
+                  );
+                })}
+              </div>
+            )}
+
+            <button
+              onClick={handleCreate}
+              disabled={creating}
+              className="mt-4 rounded-lg bg-brand px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-brand-hover disabled:opacity-50"
+            >
+              {creating ? "Creating…" : "Create key"}
+            </button>
+          </div>
+        )}
 
         {newRawKey && (
           <div className="mt-4 rounded-lg border border-brand bg-brand-bg p-4">
@@ -191,6 +288,9 @@ export default function ApiKeysClient() {
                   <p className="mt-0.5 text-xs text-slate">
                     Created {formatDate(k.created_at)} · Last used {formatDate(k.last_used_at)}
                     {k.revoked_at && <span className="ml-2 text-red-600">Revoked</span>}
+                  </p>
+                  <p className="mt-0.5 text-xs text-slate">
+                    Access: <span className="font-medium text-ink">{scopeLabel(k.scopes ?? [])}</span>
                   </p>
                 </div>
                 {!k.revoked_at && (
