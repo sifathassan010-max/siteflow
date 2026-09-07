@@ -61,7 +61,7 @@ export default async function Home() {
       <Nav />
 
       <main>
-        <section className="mx-auto max-w-6xl px-6 pb-16 pt-20 text-center">
+        <section className="mx-auto max-w-7xl px-6 pb-16 pt-20 text-center">
           <p className="mb-4 text-sm font-semibold uppercase tracking-wide text-flow">
             For small business websites
           </p>
@@ -94,7 +94,7 @@ export default async function Home() {
         </section>
 
         <section className="border-y border-line bg-white py-16">
-          <div className="mx-auto max-w-6xl px-6">
+          <div className="mx-auto max-w-7xl px-6">
             <h2 className="text-center text-2xl font-bold tracking-tight">
               Four tools. One login. One price if you want it all.
             </h2>
@@ -130,7 +130,7 @@ export default async function Home() {
 
         {featuredReviews.length > 0 ? (
           <section className="py-16">
-            <div className="mx-auto max-w-6xl px-6">
+            <div className="mx-auto max-w-7xl px-6">
               <h2 className="text-center text-2xl font-bold tracking-tight">
                 What our users are saying
               </h2>
@@ -151,7 +151,7 @@ export default async function Home() {
           </section>
         ) : (
           <section className="py-14">
-            <div className="mx-auto max-w-6xl px-6">
+            <div className="mx-auto max-w-7xl px-6">
               <div className="rounded-2xl border border-dashed border-line bg-white px-6 py-8 text-center">
                 <h2 className="text-base font-bold tracking-tight">
                   Be one of the first to share your SiteFlow experience.
@@ -168,7 +168,7 @@ export default async function Home() {
         )}
 
         <section className="py-14">
-          <div className="mx-auto max-w-6xl px-6">
+          <div className="mx-auto max-w-7xl px-6">
             <div className="rounded-2xl border border-line bg-white px-6 py-8 text-center">
               <h2 className="text-base font-bold tracking-tight">Built with transparency</h2>
               <p className="mx-auto mt-2 max-w-xl text-sm text-slate">
