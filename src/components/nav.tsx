@@ -34,17 +34,17 @@ export default function Nav() {
 
   return (
     <header className="sticky top-0 z-50 border-b border-line bg-canvas/90 backdrop-blur">
-      <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
+      <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
         <Link href="/" className="text-lg font-bold tracking-tight">
           Site<span className="text-brand">Flow</span>
         </Link>
 
-        <nav className="hidden items-center gap-6 text-sm font-medium md:flex">
+        <nav className="hidden items-center gap-5 text-sm font-medium md:flex">
           {TOOLS.map((tool) => (
             <Link
               key={tool.href}
               href={tool.href}
-              className="text-ink/80 transition hover:text-ink"
+              className="whitespace-nowrap text-ink/80 transition hover:text-ink"
             >
               {tool.name}
             </Link>
@@ -56,7 +56,7 @@ export default function Nav() {
             onMouseLeave={() => setFreeOpen(false)}
           >
             <button
-              className="flex items-center gap-1 text-ink/80 transition hover:text-ink"
+              className="flex items-center gap-1 whitespace-nowrap text-ink/80 transition hover:text-ink"
               onClick={() => setFreeOpen((v) => !v)}
             >
               Free tools
@@ -83,14 +83,14 @@ export default function Nav() {
             <Link
               key={link.href}
               href={link.href}
-              className="text-ink/80 transition hover:text-ink"
+              className="whitespace-nowrap text-ink/80 transition hover:text-ink"
             >
               {link.name}
             </Link>
           ))}
 
           {user && (
-            <Link href="/dashboard" className="text-ink/80 transition hover:text-ink">
+            <Link href="/dashboard" className="whitespace-nowrap text-ink/80 transition hover:text-ink">
               Dashboard
             </Link>
           )}
@@ -102,7 +102,9 @@ export default function Nav() {
             <div className="h-9 w-24" />
           ) : user ? (
             <>
-              <span className="hidden text-sm text-slate sm:block">{user.email}</span>
+              <span className="hidden truncate text-sm text-slate lg:block lg:max-w-[180px]">
+                {user.email}
+              </span>
               <button
                 onClick={handleSignOut}
                 className="rounded-full border border-line px-4 py-2 text-sm font-semibold text-ink transition hover:border-ink/30"

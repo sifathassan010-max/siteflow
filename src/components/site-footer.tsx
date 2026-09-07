@@ -63,7 +63,7 @@ function SupportColumn() {
 export default function SiteFooter() {
   return (
     <footer className="border-t border-line bg-white">
-      <div className="mx-auto max-w-6xl px-6 py-14">
+      <div className="mx-auto max-w-7xl px-6 py-14">
         <div className="max-w-xs">
           <Link href="/" className="text-lg font-bold tracking-tight">
             Site<span className="text-brand">Flow</span>
