@@ -3,6 +3,8 @@ import Link from "next/link";
 import Nav from "@/components/nav";
 import SiteFooter from "@/components/site-footer";
 import FlowDiagram from "@/components/flow-diagram";
+import TestimonialCard from "@/components/testimonial-card";
+import { createClient } from "@/lib/supabase/server";
 
 export const metadata: Metadata = {
   title: "Website Toolkit for Small Business: AI Chatbot, SEO, Forms & Analytics | SiteFlow",
@@ -44,7 +46,16 @@ const TOOLS = [
   },
 ];
 
-export default function Home() {
+export default async function Home() {
+  const supabase = await createClient();
+  const { data: testimonials } = await supabase
+    .from("testimonials")
+    .select("id, rating, liked, display_name, company_name, role, website_url, photo_url")
+    .order("created_at", { ascending: false })
+    .limit(5);
+
+  const featuredReviews = testimonials ?? [];
+
   return (
     <div className="min-h-screen">
       <Nav />
@@ -116,6 +127,45 @@ export default function Home() {
             </div>
           </div>
         </section>
+
+        {featuredReviews.length > 0 ? (
+          <section className="py-16">
+            <div className="mx-auto max-w-6xl px-6">
+              <h2 className="text-center text-2xl font-bold tracking-tight">
+                What our users are saying
+              </h2>
+              <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+                {featuredReviews.map((t) => (
+                  <TestimonialCard key={t.id} testimonial={t} />
+                ))}
+              </div>
+              <div className="mt-8 text-center">
+                <Link
+                  href="/reviews"
+                  className="inline-block rounded-full border border-line bg-white px-6 py-3 text-sm font-semibold text-ink transition hover:border-ink/30"
+                >
+                  View all reviews
+                </Link>
+              </div>
+            </div>
+          </section>
+        ) : (
+          <section className="py-14">
+            <div className="mx-auto max-w-6xl px-6">
+              <div className="rounded-2xl border border-dashed border-line bg-white px-6 py-8 text-center">
+                <h2 className="text-base font-bold tracking-tight">
+                  Be one of the first to share your SiteFlow experience.
+                </h2>
+                <Link
+                  href="/reviews"
+                  className="mt-3 inline-block text-sm font-semibold text-brand hover:underline"
+                >
+                  View reviews →
+                </Link>
+              </div>
+            </div>
+          </section>
+        )}
 
         <section className="py-14">
           <div className="mx-auto max-w-6xl px-6">
