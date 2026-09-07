@@ -32,6 +32,7 @@ export const FREE_TOOLS = [
 // stay on disk unused, or you can delete that too.
 export const TOP_LINKS = [
   { name: "Pricing", href: "/pricing" },
+  { name: "Reviews", href: "/reviews" },
   { name: "Discussions", href: "/discussions" },
 ];
 
@@ -42,4 +43,5 @@ export const SIDEBAR_LINKS = [
   { name: "Profile", href: "/dashboard/profile" },
   { name: "Settings", href: "/dashboard/settings" },
   { name: "API keys", href: "/dashboard/settings/api-keys" },
+  { name: "Give Feedback", href: "/dashboard/feedback" },
 ];
