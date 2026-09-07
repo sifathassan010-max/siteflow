@@ -58,7 +58,7 @@ export default function FreeToolsPage() {
     <div className="min-h-screen">
       <Nav />
 
-      <main className="mx-auto max-w-6xl px-6 py-16">
+      <main className="mx-auto max-w-7xl px-6 py-16">
         <div className="text-center">
           <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
             Free tools for your website
