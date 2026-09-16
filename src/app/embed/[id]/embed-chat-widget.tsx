@@ -1,12 +1,17 @@
 "use client";
 
-import { useState, useRef, useEffect, useMemo } from "react";
+import { useState, useRef, useEffect } from "react";
 import type { CustomQuery } from "@/lib/chatbot-custom-queries";
-import { AVATAR_MIN_SIZE, type BotAvatarConfig } from "@/lib/chatbot-bot-avatars";
 import { SITE_URL } from "@/lib/site-url";
 
 type Message = { role: "user" | "assistant"; content: string };
 
+// Note: the bot's configured avatar (single image/GIF, or a rotating
+// multi-avatar set) is rendered on the floating launcher bubble by
+// widget.js, on the *parent* page, before the chat is opened. Once the
+// visitor opens the chat, the avatar's job is done — nothing avatar-related
+// belongs in this panel's header, so this component doesn't take an
+// avatarConfig prop at all.
 export default function EmbedChatWidget({
   botId,
   botName,
@@ -15,7 +20,6 @@ export default function EmbedChatWidget({
   logoUrl,
   escalationContact,
   customQueries = [],
-  avatarConfig = null,
 }: {
   botId: string;
   botName: string;
@@ -24,38 +28,8 @@ export default function EmbedChatWidget({
   logoUrl: string | null;
   escalationContact: string | null;
   customQueries?: CustomQuery[];
-  avatarConfig?: BotAvatarConfig | null;
 }) {
   const [expandedQueryIndex, setExpandedQueryIndex] = useState<number | null>(null);
-
-  // Bot avatar: single image/GIF, or a rotating set of 2-4 (paid feature).
-  // Clicking the avatar minimizes it into a small circle pinned above the
-  // message box, labeled with the bot's name; clicking that circle
-  // restores the full-size avatar in the header.
-  const avatars = useMemo(
-    () => (avatarConfig?.avatars ?? []).filter((a) => a.url),
-    [avatarConfig]
-  );
-  const hasAvatar = avatars.length > 0;
-  const [activeAvatarIndex, setActiveAvatarIndex] = useState(0);
-  const [avatarMinimized, setAvatarMinimized] = useState(false);
-  const [avatarTransitioning, setAvatarTransitioning] = useState(false);
-  const activeAvatar = avatars[activeAvatarIndex % avatars.length] ?? null;
-
-  useEffect(() => {
-    if (avatarConfig?.mode !== "multiple" || avatars.length < 2) return;
-    const intervalMs = Math.max(avatarConfig.frequencySeconds, 1) * 1000;
-    const id = setInterval(() => {
-      // Minimize the current avatar, then swap to the next one and grow
-      // it back in — mirrors the manual minimize/restore interaction.
-      setAvatarTransitioning(true);
-      setTimeout(() => {
-        setActiveAvatarIndex((i) => (i + 1) % avatars.length);
-        setAvatarTransitioning(false);
-      }, 250);
-    }, intervalMs);
-    return () => clearInterval(id);
-  }, [avatarConfig?.mode, avatarConfig?.frequencySeconds, avatars.length]);
   const [messages, setMessages] = useState<Message[]>([
     { role: "assistant", content: `Hi! I'm ${botName}. How can I help?` },
   ]);
@@ -174,27 +148,9 @@ export default function EmbedChatWidget({
 
       <div className="flex items-center justify-between border-b border-line px-4 py-3">
         <div className="flex items-center gap-2">
-          {hasAvatar && activeAvatar && !avatarMinimized ? (
-            <button
-              type="button"
-              onClick={() => setAvatarMinimized(true)}
-              title="Minimize avatar"
-              className="shrink-0 overflow-hidden rounded-full border border-line transition-transform duration-300 ease-out"
-              style={{
-                width: activeAvatar.size,
-                height: activeAvatar.size,
-                transform: avatarTransitioning ? "scale(0.15)" : "scale(1)",
-              }}
-            >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={activeAvatar.url} alt="" className="h-full w-full object-cover" />
-            </button>
-          ) : (
-            !hasAvatar &&
-            logoUrl && (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={logoUrl} alt="" className="h-6 w-6 rounded object-contain" />
-            )
+          {logoUrl && (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={logoUrl} alt="" className="h-6 w-6 rounded object-contain" />
           )}
           <p className="text-sm font-semibold">{botName}</p>
         </div>
@@ -320,30 +276,6 @@ export default function EmbedChatWidget({
           </div>
 
           {error && <p className="px-4 pb-2 text-sm text-red-600">{error}</p>}
-
-          {hasAvatar && activeAvatar && avatarMinimized && (
-            <div className="flex justify-center border-t border-line bg-canvas px-4 py-1.5">
-              <button
-                type="button"
-                onClick={() => setAvatarMinimized(false)}
-                title="Expand avatar"
-                className="flex items-center gap-2 rounded-full py-0.5 pl-0.5 pr-3 text-xs font-medium text-slate transition hover:bg-white"
-              >
-                <span
-                  className="shrink-0 overflow-hidden rounded-full border border-line transition-transform duration-300 ease-out"
-                  style={{
-                    width: AVATAR_MIN_SIZE,
-                    height: AVATAR_MIN_SIZE,
-                    transform: avatarTransitioning ? "scale(0.15)" : "scale(1)",
-                  }}
-                >
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={activeAvatar.url} alt="" className="h-full w-full object-cover" />
-                </span>
-                <span>{botName} · Assistant</span>
-              </button>
-            </div>
-          )}
 
           <form onSubmit={handleSubmit} className="flex gap-2 border-t border-line p-3">
             <input
