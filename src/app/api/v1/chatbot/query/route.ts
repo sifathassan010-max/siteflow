@@ -1,6 +1,7 @@
 import { authenticateApiRequest } from "@/lib/api-auth";
 import { checkApiUsageLimit, logApiUsage } from "@/lib/api-usage";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { resolveGroqModel } from "@/lib/groq-models";
 import { NextResponse } from "next/server";
 
 // POST /api/v1/chatbot/query
@@ -79,7 +80,7 @@ export async function POST(request: Request) {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: (bot.model as string) || "llama-3.1-8b-instant",
+        model: resolveGroqModel(bot.model),
         messages: [
           { role: "system", content: systemPrompt },
           { role: "user", content: body.message },

@@ -12,6 +12,7 @@ import { z } from "zod";
 import { verifyApiKey } from "@/lib/api-keys";
 import { checkApiUsageLimit, logApiUsage, type ApiTool } from "@/lib/api-usage";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { resolveGroqModel } from "@/lib/groq-models";
 import { analyzePage } from "@/lib/seo-audit";
 
 const MAX_ANALYTICS_DAYS = 90;
@@ -267,7 +268,7 @@ const handler = createMcpHandler(
               "Content-Type": "application/json",
             },
             body: JSON.stringify({
-              model: (bot.model as string) || "llama-3.1-8b-instant",
+              model: resolveGroqModel(bot.model),
               messages: [
                 { role: "system", content: systemPrompt },
                 { role: "user", content: message },

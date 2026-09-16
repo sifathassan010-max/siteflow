@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { DEFAULT_GROQ_MODEL } from "@/lib/groq-models";
 import { NextResponse } from "next/server";
 
 const SYSTEM_PROMPT = `You are a friendly, helpful AI chatbot demo for SiteFlow.
@@ -41,7 +42,7 @@ export async function POST(request: Request) {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "llama-3.1-8b-instant",
+        model: DEFAULT_GROQ_MODEL,
         messages: [
           { role: "system", content: SYSTEM_PROMPT },
           { role: "user", content: message },

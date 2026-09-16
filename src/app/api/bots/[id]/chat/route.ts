@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { checkUsageLimit, logUsage } from "@/lib/usage";
+import { resolveGroqModel } from "@/lib/groq-models";
 import { NextResponse } from "next/server";
 
 function buildSystemPrompt(
@@ -88,7 +89,7 @@ export async function POST(
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: bot.model || "llama-3.1-8b-instant",
+        model: resolveGroqModel(bot.model),
         messages: [
           {
             role: "system",

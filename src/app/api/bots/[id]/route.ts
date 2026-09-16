@@ -4,11 +4,13 @@ import { isPaidForTool } from "@/lib/usage";
 import { sanitizeCustomQueries } from "@/lib/chatbot-custom-queries";
 import { sanitizeBotAvatarConfig } from "@/lib/chatbot-bot-avatars";
 import { sanitizeWidgetPosition } from "@/lib/chatbot-widget-position";
+import { GROQ_MODEL_OPTIONS } from "@/lib/groq-models";
 
 // Groq models available to pick between in the widget appearance/settings
 // form. Keep this list short and validate against it server-side so a bad
-// value can't get stored and silently break the chat route.
-export const ALLOWED_MODELS = ["llama-3.1-8b-instant", "llama-3.3-70b-versatile"] as const;
+// value can't get stored and silently break the chat route. Sourced from
+// @/lib/groq-models so this list and the actual API calls never drift.
+export const ALLOWED_MODELS = GROQ_MODEL_OPTIONS.map((m) => m.value);
 
 export async function GET(
   _request: Request,

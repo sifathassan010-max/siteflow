@@ -1,5 +1,6 @@
 import { createAdminClient } from "@/lib/supabase/admin";
 import { checkUsageLimit, logUsage } from "@/lib/usage";
+import { resolveGroqModel } from "@/lib/groq-models";
 import { NextResponse } from "next/server";
 
 // How many past turns (user+assistant pairs) to feed back to the model as
@@ -153,7 +154,7 @@ export async function POST(
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: bot.model || "llama-3.1-8b-instant",
+        model: resolveGroqModel(bot.model),
         messages: [
           {
             role: "system",
