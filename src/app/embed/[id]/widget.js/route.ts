@@ -97,12 +97,21 @@ export async function GET(
 
   var offsets = ${JSON.stringify(offsets)};
   var embedUrl = ${JSON.stringify(embedUrl)};
+
+  // Never run inside our own chat panel. The panel is an iframe pointing at
+  // embedUrl; if that page ever loads this script too, we would draw a
+  // second launcher bubble on top of the open panel and open a chat inside
+  // the chat on every click. Cheap, exact check — the page's own address.
+  try {
+    if (window.location.href.indexOf(embedUrl) === 0) return;
+  } catch (e) {}
+
   var widgetColor = ${JSON.stringify(widgetColor)};
   var botName = ${JSON.stringify(botName)};
   var avatars = ${JSON.stringify(avatars)}; // [{ url, size }], already validated server-side
   var rotates = ${JSON.stringify(rotates)};
   var rotateMs = ${JSON.stringify(frequencySeconds)} * 1000;
-  var BUBBLE_HIT_SIZE = 64; // fixed hit-target/wrapper size so the bubble never jumps around as avatars of different sizes rotate in
+  var DEFAULT_ICON_SIZE = 64; // only used when no avatar is configured
 
   var wrapper = document.createElement("div");
   wrapper.id = wrapperId;
@@ -116,12 +125,13 @@ export async function GET(
   var bubble = document.createElement("button");
   bubble.type = "button";
   bubble.setAttribute("aria-label", "Open chat with " + botName);
-  bubble.style.width = BUBBLE_HIT_SIZE + "px";
-  bubble.style.height = BUBBLE_HIT_SIZE + "px";
+  bubble.style.width = DEFAULT_ICON_SIZE + "px";
+  bubble.style.height = DEFAULT_ICON_SIZE + "px";
   bubble.style.borderRadius = "50%";
   bubble.style.border = "none";
   bubble.style.padding = "0";
   bubble.style.cursor = "pointer";
+  bubble.style.overflow = "hidden"; // keep the avatar clipped to the circle
   bubble.style.boxShadow = "0 8px 24px rgba(0,0,0,0.22)";
   bubble.style.display = "flex";
   bubble.style.alignItems = "center";
@@ -131,9 +141,14 @@ export async function GET(
   bubble.onmouseenter = function () { bubble.style.transform = "scale(1.06)"; };
   bubble.onmouseleave = function () { bubble.style.transform = "scale(1)"; };
 
-  // The avatar itself sits inside the bubble in its own wrapper, sized per
-  // the owner's chosen size and independently scaled for the shrink/grow
-  // swap animation, so it never fights with the bubble's own hover scale.
+  // The avatar itself sits inside the bubble in its own wrapper, independently
+  // scaled for the shrink/grow swap animation so it never fights with the
+  // bubble's own hover scale. The BUBBLE is resized to the owner's chosen
+  // avatar size (40-120px) rather than staying a fixed 64px circle — that
+  // fixed size is what made the size picker look like it did nothing, and it
+  // clipped or spilled anything bigger than 64px. With an avatar set, the
+  // bubble also drops its brand-colour fill, so what the visitor sees is the
+  // image/GIF itself at the chosen size, not an image inside a coloured disc.
   var avatarSlot = document.createElement("div");
   avatarSlot.style.borderRadius = "50%";
   avatarSlot.style.overflow = "hidden";
@@ -146,9 +161,26 @@ export async function GET(
   var avatarImg = null;
   var activeIndex = 0;
 
+  // If an avatar URL is dead (deleted from storage, a bucket that is not
+  // public, or a link that is a web page rather than an image file), the
+  // browser paints a broken-image glyph inside the bubble. Fall back to the
+  // default chat icon instead, so a bad URL never looks like a broken site.
+  function showDefaultIcon() {
+    if (rotateTimer) { clearInterval(rotateTimer); rotateTimer = null; }
+    avatarImg = null;
+    bubble.innerHTML = ${JSON.stringify(defaultIconSvg)};
+    bubble.style.background = widgetColor;
+    bubble.style.boxShadow = "0 8px 24px rgba(0,0,0,0.22)";
+    bubble.style.width = DEFAULT_ICON_SIZE + "px";
+    bubble.style.height = DEFAULT_ICON_SIZE + "px";
+  }
+
   function showAvatar(index) {
     var avatar = avatars[index];
     if (!avatar) return;
+    // The bubble, its hit area and the slot all follow the chosen size.
+    bubble.style.width = avatar.size + "px";
+    bubble.style.height = avatar.size + "px";
     avatarSlot.style.width = avatar.size + "px";
     avatarSlot.style.height = avatar.size + "px";
     if (!avatarImg) {
@@ -157,20 +189,28 @@ export async function GET(
       avatarImg.style.width = "100%";
       avatarImg.style.height = "100%";
       avatarImg.style.objectFit = "cover";
+      avatarImg.style.display = "block";
+      avatarImg.onerror = showDefaultIcon;
       avatarSlot.appendChild(avatarImg);
     }
     // Plain <img> so GIFs keep animating natively — no extra work needed.
     avatarImg.src = avatar.url;
   }
 
+  var rotateTimer = null;
+
   if (avatars.length > 0) {
-    showAvatar(0);
+    // No coloured disc behind a real avatar — the image or GIF is the bubble.
+    // The drop shadow goes too: on a transparent PNG/GIF it would draw a
+    // visible ring around the artwork instead of hugging it.
+    bubble.style.background = "transparent";
+    bubble.style.boxShadow = "none";
     bubble.appendChild(avatarSlot);
+    showAvatar(0);
   } else {
     bubble.innerHTML = ${JSON.stringify(defaultIconSvg)};
   }
 
-  var rotateTimer = null;
   if (rotates) {
     rotateTimer = setInterval(function () {
       // Shrink the current avatar out, swap the image while invisible-small,

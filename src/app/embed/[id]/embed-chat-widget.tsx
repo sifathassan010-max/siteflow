@@ -150,7 +150,17 @@ export default function EmbedChatWidget({
         <div className="flex items-center gap-2">
           {logoUrl && (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={logoUrl} alt="" className="h-6 w-6 rounded object-contain" />
+            <img
+              src={logoUrl}
+              alt=""
+              className="h-6 w-6 rounded object-contain"
+              // A dead logo URL would otherwise paint a broken-image glyph in
+              // the header. Nothing avatar/logo-shaped belongs here unless it
+              // actually loads, so hide it if it fails.
+              onError={(e) => {
+                e.currentTarget.style.display = "none";
+              }}
+            />
           )}
           <p className="text-sm font-semibold">{botName}</p>
         </div>
