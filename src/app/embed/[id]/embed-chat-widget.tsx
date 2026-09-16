@@ -150,10 +150,16 @@ export default function EmbedChatWidget({
   const showQuickPrompts = quickPrompts.length > 0 && messages.length === 1 && !loading;
   const showCustomQueries = customQueries.length > 0 && messages.length === 1 && !loading;
 
+  // Tells the widget.js loader script (running in the parent page, one
+  // level up from this iframe) to swap back to the small launcher bubble.
+  function minimizeWidget() {
+    window.parent.postMessage({ type: "siteflow:minimize", botId }, "*");
+  }
+
   return (
     <div className="flex h-full flex-col">
       {/* Attribution bar — pinned above the header, never scrolls away with
-          the messages. Shown for every bot, free or paid. */}
+          the messages. Shown once, at the top, for every bot, free or paid. */}
       <div className="flex shrink-0 items-center justify-center border-b border-line bg-canvas px-2 py-1">
         <a
           href={SITE_URL}
@@ -192,12 +198,25 @@ export default function EmbedChatWidget({
           )}
           <p className="text-sm font-semibold">{botName}</p>
         </div>
-        <button
-          onClick={() => setShowLeadForm((v) => !v)}
-          className="text-xs font-medium text-slate hover:text-ink"
-        >
-          {showLeadForm ? "Back to chat" : "Leave your info"}
-        </button>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => setShowLeadForm((v) => !v)}
+            className="text-xs font-medium text-slate hover:text-ink"
+          >
+            {showLeadForm ? "Back to chat" : "Leave your info"}
+          </button>
+          <button
+            type="button"
+            onClick={minimizeWidget}
+            aria-label="Minimize chat"
+            title="Minimize"
+            className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-slate transition hover:bg-canvas hover:text-ink"
+          >
+            <svg viewBox="0 0 20 20" width="14" height="14" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M5 5l10 10M15 5L5 15" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" />
+            </svg>
+          </button>
+        </div>
       </div>
 
       {showLeadForm ? (
@@ -346,9 +365,8 @@ export default function EmbedChatWidget({
         </>
       )}
 
-      <div className="flex items-center justify-between border-t border-line bg-canvas px-4 py-2">
-        <p className="text-xs text-slate">Powered by SiteFlow</p>
-        {escalationContact && (
+      {escalationContact && (
+        <div className="flex items-center justify-end border-t border-line bg-canvas px-4 py-2">
           <a
             href={
               escalationContact.includes("@") ? `mailto:${escalationContact}` : escalationContact
@@ -359,8 +377,8 @@ export default function EmbedChatWidget({
           >
             Talk to a human
           </a>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 }

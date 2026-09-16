@@ -12,6 +12,7 @@ import {
   DEFAULT_WIDGET_POSITION,
   type WidgetPosition,
 } from "@/lib/chatbot-widget-position";
+import { GROQ_MODEL_OPTIONS, resolveGroqModel } from "@/lib/groq-models";
 
 type Bot = {
   id: string;
@@ -30,10 +31,9 @@ type Bot = {
   last_trained_at: string | null;
 };
 
-const MODEL_OPTIONS = [
-  { value: "llama-3.1-8b-instant", label: "Fast (llama-3.1-8b-instant)" },
-  { value: "llama-3.3-70b-versatile", label: "Thorough (llama-3.3-70b-versatile)" },
-];
+// Sourced from @/lib/groq-models so this list can never drift out of sync
+// with what the chat routes actually send to Groq.
+const MODEL_OPTIONS = GROQ_MODEL_OPTIONS;
 
 export default function BotSettingsForm({
   bot,
@@ -49,7 +49,10 @@ export default function BotSettingsForm({
   const [widgetColor, setWidgetColor] = useState(bot.widget_color);
   const [logoUrl, setLogoUrl] = useState(bot.logo_url ?? "");
   const [escalationContact, setEscalationContact] = useState(bot.escalation_contact ?? "");
-  const [model, setModel] = useState(bot.model);
+  // resolveGroqModel remaps a bot saved under an old, since-deprecated
+  // model id (e.g. llama-3.1-8b-instant) to its live replacement, so the
+  // dropdown below never shows a stale/invalid selection.
+  const [model, setModel] = useState(resolveGroqModel(bot.model));
   const [customQueries, setCustomQueries] = useState<CustomQuery[]>(
     bot.custom_queries.length > 0 ? bot.custom_queries : [emptyCustomQuery()]
   );

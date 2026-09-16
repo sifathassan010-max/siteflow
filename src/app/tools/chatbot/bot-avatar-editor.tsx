@@ -332,7 +332,7 @@ function AvatarKindCard({
       </div>
 
       <div
-        className={locked ? "pointer-events-none opacity-50" : ""}
+        className={locked ? "cursor-not-allowed opacity-50" : ""}
         onClickCapture={(e) => {
           if (locked) {
             e.preventDefault();
