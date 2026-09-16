@@ -25,6 +25,16 @@ import {
 // to the bubble. The snippet the customer pastes never has to change when
 // the owner changes the position, color or avatar later — this script
 // looks everything up fresh on every page load.
+// This route must run fresh on every single request — it's the only place
+// the bot's avatar/position/color settings reach a visitor's browser, and
+// an owner who just changed those in Settings expects the change to show
+// up immediately, not after a build-time cache or CDN cache window. Force
+// dynamic rendering explicitly rather than relying on Next.js's default
+// heuristics (using the Request object already implies this, but stating
+// it directly here removes any ambiguity).
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export async function GET(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
@@ -243,7 +253,7 @@ export async function GET(
   return new NextResponse(script, {
     headers: {
       "Content-Type": "application/javascript; charset=utf-8",
-      "Cache-Control": "public, max-age=300",
+      "Cache-Control": "no-store, must-revalidate",
       "Access-Control-Allow-Origin": "*",
     },
   });

@@ -1,6 +1,10 @@
 import { createAdminClient } from "@/lib/supabase/admin";
 import EmbedChatWidget from "./embed-chat-widget";
 
+// Always fresh — see the matching note in widget.js/route.ts.
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 // PUBLIC page — not under /dashboard or /tools, so middleware doesn't
 // require login here. This is what a customer puts in an <iframe> on
 // their own website for their own visitors to talk to.
