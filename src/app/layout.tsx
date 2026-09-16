@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { SITE_URL } from "@/lib/site-url";
 import ServiceWorkerCleanup from "@/components/service-worker-cleanup";
-import SiteChatWidget from "@/components/site-chat-widget";
 
 // Note: swapped next/font/google for system fonts here since this sandbox
 // can't reach fonts.googleapis.com. Vercel's build servers can reach it fine,
@@ -58,12 +57,19 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           // eslint-disable-next-line react/no-danger
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
-        {/* SiteFlow chat widget: floats in the corner picked under Settings ->
-            Widget Position. Mounted through a guarded client component so it
-            never loads on /embed/* pages or inside an iframe — see the note
-            in site-chat-widget.tsx. */}
-        <SiteChatWidget />
+        {/* SiteFlow chat widget: floats in the corner picked under Settings -> Widget Position */}
+        <script
+          src="https://siteflow-omega.vercel.app/embed/aa2d30e3-bccc-4a1c-90e1-b885cef18043/widget.js"
+        ></script>
+        <noscript>
+          <iframe
+            src="https://siteflow-omega.vercel.app/embed/aa2d30e3-bccc-4a1c-90e1-b885cef18043"
+            style={{ width: "100%", maxWidth: 400, height: 600, border: "none", borderRadius: 16 }}
+            title="Chat widget"
+          />
+        </noscript>
       </body>
     </html>
   );
 }
+
