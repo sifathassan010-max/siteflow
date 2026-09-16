@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 import "./globals.css";
 import { SITE_URL } from "@/lib/site-url";
 import ServiceWorkerCleanup from "@/components/service-worker-cleanup";
@@ -57,6 +58,18 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           // eslint-disable-next-line react/no-danger
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
+        {/* SiteFlow chat widget: floats in the corner picked under Settings -> Widget Position */}
+        <Script
+          src="https://siteflow-omega.vercel.app/embed/aa2d30e3-bccc-4a1c-90e1-b885cef18043/widget.js"
+          strategy="afterInteractive"
+        />
+        <noscript>
+          <iframe
+            src="https://siteflow-omega.vercel.app/embed/aa2d30e3-bccc-4a1c-90e1-b885cef18043"
+            style={{ width: "100%", maxWidth: 400, height: 600, border: "none", borderRadius: 16 }}
+            title="Chat widget"
+          />
+        </noscript>
       </body>
     </html>
   );
