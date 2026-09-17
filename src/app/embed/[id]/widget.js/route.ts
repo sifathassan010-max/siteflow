@@ -112,6 +112,7 @@ export async function GET(
   var rotates = ${JSON.stringify(rotates)};
   var rotateMs = ${JSON.stringify(frequencySeconds)} * 1000;
   var DEFAULT_ICON_SIZE = 64; // only used when no avatar is configured
+  var AVATAR_FRAME_SIZE = 120; // fixed frame the avatar sits inside — see below
 
   var wrapper = document.createElement("div");
   wrapper.id = wrapperId;
@@ -143,19 +144,26 @@ export async function GET(
 
   // The avatar itself sits inside the bubble in its own wrapper, independently
   // scaled for the shrink/grow swap animation so it never fights with the
-  // bubble's own hover scale. The BUBBLE is resized to the owner's chosen
-  // avatar size (40-120px) rather than staying a fixed 64px circle — that
-  // fixed size is what made the size picker look like it did nothing, and it
-  // clipped or spilled anything bigger than 64px. With an avatar set, the
-  // bubble also drops its brand-colour fill, so what the visitor sees is the
-  // image/GIF itself at the chosen size, not an image inside a coloured disc.
+  // bubble's own hover scale.
+  //
+  // The BUBBLE (the button, i.e. the click target and the corner it's
+  // pinned to) stays a fixed AVATAR_FRAME_SIZE square, transparent, the
+  // whole time — it never resizes as the chosen avatar size changes. This
+  // matches the size picker in the dashboard itself (bot-avatar-editor.tsx):
+  // a fixed max-size frame with the avatar image scaled up/down inside it,
+  // not a frame that grows and shrinks with the image. Only the avatarSlot
+  // — the circular image itself — is set to the owner's chosen size
+  // (40-120px) and centered inside that fixed frame. With an avatar set,
+  // the bubble also drops its brand-colour fill and shadow, so what the
+  // visitor sees is just the image/GIF floating at its chosen size, not an
+  // image inside a coloured disc that changes size with it.
   var avatarSlot = document.createElement("div");
   avatarSlot.style.borderRadius = "50%";
   avatarSlot.style.overflow = "hidden";
   avatarSlot.style.display = "flex";
   avatarSlot.style.alignItems = "center";
   avatarSlot.style.justifyContent = "center";
-  avatarSlot.style.transition = "transform 0.25s ease";
+  avatarSlot.style.transition = "width 0.2s ease, height 0.2s ease, transform 0.25s ease";
   avatarSlot.style.transform = "scale(1)";
 
   var avatarImg = null;
@@ -178,9 +186,9 @@ export async function GET(
   function showAvatar(index) {
     var avatar = avatars[index];
     if (!avatar) return;
-    // The bubble, its hit area and the slot all follow the chosen size.
-    bubble.style.width = avatar.size + "px";
-    bubble.style.height = avatar.size + "px";
+    // Only the inner slot follows the chosen size — the bubble/frame stays
+    // fixed at AVATAR_FRAME_SIZE so the click target and page layout never
+    // shift as differently-sized avatars rotate in.
     avatarSlot.style.width = avatar.size + "px";
     avatarSlot.style.height = avatar.size + "px";
     if (!avatarImg) {
@@ -200,9 +208,12 @@ export async function GET(
   var rotateTimer = null;
 
   if (avatars.length > 0) {
-    // No coloured disc behind a real avatar — the image or GIF is the bubble.
-    // The drop shadow goes too: on a transparent PNG/GIF it would draw a
-    // visible ring around the artwork instead of hugging it.
+    // Fixed frame, not a coloured disc: the image/GIF is what the visitor
+    // sees, at its own chosen size, centered in a frame that doesn't move.
+    bubble.style.width = AVATAR_FRAME_SIZE + "px";
+    bubble.style.height = AVATAR_FRAME_SIZE + "px";
+    bubble.style.borderRadius = "0"; // a plain box — it's invisible anyway
+    bubble.style.overflow = "visible"; // never clip the (smaller-or-equal) avatarSlot
     bubble.style.background = "transparent";
     bubble.style.boxShadow = "none";
     bubble.appendChild(avatarSlot);
