@@ -51,7 +51,7 @@ export const MAX_MULTI_AVATARS = 4;
 // server-side in the upload route (never trust the client). Small on
 // purpose — this loads on every visitor's first paint of the widget.
 export const MAX_IMAGE_BYTES = 500 * 1024; // 500KB
-export const MAX_GIF_BYTES = 2 * 1024 * 1024; // 2MB
+export const MAX_GIF_BYTES = 5 * 1024 * 1024; // 5MB
 export const ALLOWED_IMAGE_MIME = ["image/png", "image/jpeg"];
 export const ALLOWED_GIF_MIME = ["image/gif"];
 
