@@ -30,8 +30,8 @@ export type BotAvatarConfig = {
 // ones. Offered as discrete steps rather than a free-form number so every
 // value renders crisply and the slider has a sensible number of stops.
 export const AVATAR_MIN_SIZE = 40;
-export const AVATAR_MAX_SIZE = 120;
-const AVATAR_SIZE_STEP = 8;
+export const AVATAR_MAX_SIZE = 300;
+const AVATAR_SIZE_STEP = 20;
 export const AVATAR_SIZE_OPTIONS: number[] = Array.from(
   { length: (AVATAR_MAX_SIZE - AVATAR_MIN_SIZE) / AVATAR_SIZE_STEP + 1 },
   (_, i) => AVATAR_MIN_SIZE + i * AVATAR_SIZE_STEP
