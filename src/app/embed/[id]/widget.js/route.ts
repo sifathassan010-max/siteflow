@@ -112,7 +112,6 @@ export async function GET(
   var rotates = ${JSON.stringify(rotates)};
   var rotateMs = ${JSON.stringify(frequencySeconds)} * 1000;
   var DEFAULT_ICON_SIZE = 64; // only used when no avatar is configured
-  var AVATAR_FRAME_SIZE = ${JSON.stringify(AVATAR_MAX_SIZE)}; // fixed frame size whenever an avatar is set
 
   var wrapper = document.createElement("div");
   wrapper.id = wrapperId;
@@ -144,13 +143,10 @@ export async function GET(
 
   // The avatar itself sits inside the bubble in its own wrapper, independently
   // scaled for the shrink/grow swap animation so it never fights with the
-  // bubble's own hover scale. The BUBBLE (the frame/hit area) stays fixed at
-  // AVATAR_FRAME_SIZE (120px, the largest size the picker allows) whenever an
-  // avatar is set, and is transparent — it never resizes with the picker.
-  // Only the avatarSlot inside it — and the image/GIF within that slot — grows
-  // or shrinks to the owner's chosen size (40-120px), centered in the fixed
-  // frame. That matches the "Avatar size" preview in the builder: a fixed
-  // outer circle with the art scaling inside it. With an avatar set, the
+  // bubble's own hover scale. The BUBBLE is resized to the owner's chosen
+  // avatar size (40-120px) rather than staying a fixed 64px circle — that
+  // fixed size is what made the size picker look like it did nothing, and it
+  // clipped or spilled anything bigger than 64px. With an avatar set, the
   // bubble also drops its brand-colour fill, so what the visitor sees is the
   // image/GIF itself at the chosen size, not an image inside a coloured disc.
   var avatarSlot = document.createElement("div");
@@ -159,7 +155,7 @@ export async function GET(
   avatarSlot.style.display = "flex";
   avatarSlot.style.alignItems = "center";
   avatarSlot.style.justifyContent = "center";
-  avatarSlot.style.transition = "transform 0.25s ease, width 0.2s ease, height 0.2s ease";
+  avatarSlot.style.transition = "transform 0.25s ease";
   avatarSlot.style.transform = "scale(1)";
 
   var avatarImg = null;
@@ -182,11 +178,9 @@ export async function GET(
   function showAvatar(index) {
     var avatar = avatars[index];
     if (!avatar) return;
-    // The bubble/frame stays fixed at AVATAR_FRAME_SIZE — only the inner
-    // slot (and the image inside it) follows the chosen size, centered in
-    // the fixed frame via the bubble's own flex centering.
-    bubble.style.width = AVATAR_FRAME_SIZE + "px";
-    bubble.style.height = AVATAR_FRAME_SIZE + "px";
+    // The bubble, its hit area and the slot all follow the chosen size.
+    bubble.style.width = avatar.size + "px";
+    bubble.style.height = avatar.size + "px";
     avatarSlot.style.width = avatar.size + "px";
     avatarSlot.style.height = avatar.size + "px";
     if (!avatarImg) {
