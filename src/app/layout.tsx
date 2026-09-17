@@ -57,15 +57,17 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           // eslint-disable-next-line react/no-danger
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
-<!-- SiteFlow chat widget: floats in the corner picked under Settings -> Widget Position -->
-<script src="https://siteflow-omega.vercel.app/embed/aa2d30e3-bccc-4a1c-90e1-b885cef18043/widget.js"></script>
-<noscript>
-  <iframe
-    src="https://siteflow-omega.vercel.app/embed/aa2d30e3-bccc-4a1c-90e1-b885cef18043"
-    style="width: 100%; max-width: 400px; height: 600px; border: none; border-radius: 16px;"
-    title="Chat widget"
-  ></iframe>
-</noscript>
+        {/* SiteFlow chat widget: floats in the corner picked under Settings -> Widget Position */}
+        <script
+          src="https://siteflow-omega.vercel.app/embed/aa2d30e3-bccc-4a1c-90e1-b885cef18043/widget.js"
+        ></script>
+        <noscript>
+          <iframe
+            src="https://siteflow-omega.vercel.app/embed/aa2d30e3-bccc-4a1c-90e1-b885cef18043"
+            style={{ width: "100%", maxWidth: 400, height: 600, border: "none", borderRadius: 16 }}
+            title="Chat widget"
+          />
+        </noscript>
       </body>
     </html>
   );
