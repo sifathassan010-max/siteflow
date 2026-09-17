@@ -158,7 +158,7 @@ export async function GET(
   // visitor sees is just the image/GIF floating at its chosen size, not an
   // image inside a coloured disc that changes size with it.
   var avatarSlot = document.createElement("div");
-  avatarSlot.style.borderRadius = "50%";
+  avatarSlot.style.borderRadius = "0"; // square, not a circular clip
   avatarSlot.style.overflow = "hidden";
   avatarSlot.style.display = "flex";
   avatarSlot.style.alignItems = "center";
