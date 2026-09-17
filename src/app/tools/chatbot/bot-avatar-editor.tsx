@@ -367,14 +367,13 @@ function AvatarUploadControl({
   url: string;
   onUrlChange: (url: string) => void;
 }) {
-  const [showUrlInput, setShowUrlInput] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const accept = kind === "gif" ? ".gif" : ".jpg,.jpeg,.png";
   const maxBytes = kind === "gif" ? MAX_GIF_BYTES : MAX_IMAGE_BYTES;
-  const maxLabel = kind === "gif" ? "2MB" : "500KB";
+  const maxLabel = kind === "gif" ? "5MB" : "500KB";
 
   async function handleFileSelected(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -436,30 +435,12 @@ function AvatarUploadControl({
             onChange={handleFileSelected}
             className="hidden"
           />
-          <span className="text-xs text-slate">or</span>
-          <button
-            type="button"
-            onClick={() => setShowUrlInput((v) => !v)}
-            className="text-xs font-semibold text-brand hover:underline"
-          >
-            Use URL of your {kind === "gif" ? "GIF" : "image"}
-          </button>
         </div>
       </div>
 
-      {showUrlInput && (
-        <input
-          type="text"
-          value={url && !url.startsWith("blob:") ? url : ""}
-          onChange={(e) => onUrlChange(e.target.value)}
-          placeholder="https://... (from the web or a shared Google Drive link)"
-          className="mt-2 w-full rounded-lg border border-line px-3 py-2 text-sm"
-        />
-      )}
-
       <p className="mt-1 text-xs text-slate">
-        (in this option only {kind === "gif" ? "GIF" : "image"} files can be
-        uploaded — max {maxLabel})
+        (only {kind === "gif" ? "GIF" : "image"} files can be uploaded — max{" "}
+        {maxLabel})
       </p>
 
       {error && <p className="mt-1 text-xs text-red-600">{error}</p>}
