@@ -8,12 +8,17 @@ type Message = { role: "user" | "assistant"; content: string };
 export default function BotTestChat({
   botId,
   botName,
+  greeting,
 }: {
   botId: string;
   botName: string;
+  greeting?: string | null;
 }) {
   const [messages, setMessages] = useState<Message[]>([
-    { role: "assistant", content: `Hi! I'm ${botName}. Try me out.` },
+    {
+      role: "assistant",
+      content: greeting?.trim() ? greeting.trim() : `Hi! I'm ${botName}. Try me out.`,
+    },
   ]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);

@@ -15,6 +15,7 @@ type Message = { role: "user" | "assistant"; content: string };
 export default function EmbedChatWidget({
   botId,
   botName,
+  greeting,
   quickPrompts,
   widgetColor,
   logoUrl,
@@ -23,6 +24,14 @@ export default function EmbedChatWidget({
 }: {
   botId: string;
   botName: string;
+  // The bot owner's own "Persona / instructions" text, if they set one. It
+  // is also sent to the model as the system prompt (see chat/route.ts and
+  // v1/chatbot/query/route.ts) — using it here too as the very first thing
+  // the visitor sees is a deliberate choice: whatever the owner wrote there
+  // (a self-introduction, a tone, a scripted opener) is what they typed
+  // expecting visitors to see, so it doubles as the opening line rather
+  // than sitting hidden behind a generic "How can I help?".
+  greeting?: string | null;
   quickPrompts: string[];
   widgetColor: string;
   logoUrl: string | null;
@@ -31,7 +40,10 @@ export default function EmbedChatWidget({
 }) {
   const [expandedQueryIndex, setExpandedQueryIndex] = useState<number | null>(null);
   const [messages, setMessages] = useState<Message[]>([
-    { role: "assistant", content: `Hi! I'm ${botName}. How can I help?` },
+    {
+      role: "assistant",
+      content: greeting?.trim() ? greeting.trim() : `Hi! I'm ${botName}. How can I help?`,
+    },
   ]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);

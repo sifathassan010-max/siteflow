@@ -63,7 +63,7 @@ export default async function BotDetailPage({
         <div>
           <h2 className="text-sm font-semibold text-slate">Test this bot</h2>
           <div className="mt-3">
-            <BotTestChat botId={bot.id} botName={bot.name} />
+            <BotTestChat botId={bot.id} botName={bot.name} greeting={bot.persona} />
           </div>
         </div>
 
