@@ -80,6 +80,23 @@ export async function GET(
       ),
     }));
   const rotates = avatarConfig?.mode === "multiple" && avatars.length > 1;
+
+  // The click-target/frame size for THIS bot: the largest of its own
+  // configured avatar sizes, not the global AVATAR_MAX_SIZE (300) every
+  // bot could theoretically use. Using the global max here made the
+  // owner's Distance-from-edge sliders lie: with one small avatar (say
+  // 120px) inside a fixed 300px frame, "0px from the side" measured from
+  // the invisible frame's edge, not the avatar's own edge, leaving a real
+  // gap no matter what the slider said. Basing it on this bot's own
+  // avatars fixes that — a single avatar's frame equals its own size, so
+  // the offset lines up with what the owner actually sees, while a
+  // multi-avatar rotation still keeps the frame steady at the largest of
+  // the set (the reason a fixed frame exists at all: no layout jump as
+  // differently-sized avatars rotate through).
+  const frameSize =
+    avatars.length > 0
+      ? Math.min(AVATAR_MAX_SIZE, Math.max(...avatars.map((a) => a.size)))
+      : AVATAR_MIN_SIZE;
   const frequencySeconds =
     avatarConfig?.frequencySeconds && avatarConfig.frequencySeconds > 0
       ? avatarConfig.frequencySeconds
@@ -116,7 +133,7 @@ export async function GET(
   var rotates = ${JSON.stringify(rotates)};
   var rotateMs = ${JSON.stringify(frequencySeconds)} * 1000;
   var DEFAULT_ICON_SIZE = 64; // only used when no avatar is configured
-  var AVATAR_FRAME_SIZE = ${AVATAR_MAX_SIZE}; // fixed frame the avatar sits inside — see below
+  var AVATAR_FRAME_SIZE = ${JSON.stringify(frameSize)}; // this bot's own largest avatar — see above
 
   var wrapper = document.createElement("div");
   wrapper.id = wrapperId;
