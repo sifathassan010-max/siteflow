@@ -56,7 +56,7 @@ export async function GET(
   }
 
   const position = sanitizeWidgetPosition(bot.widget_position);
-  const offsets = cssOffsetsForPosition(position, 40);
+  const offsets = cssOffsetsForPosition(position, 30);
   const embedUrl = `${origin}/embed/${id}`;
   const widgetColor = bot.widget_color || "#4f46e5";
   const botName = bot.name || "Chat";
