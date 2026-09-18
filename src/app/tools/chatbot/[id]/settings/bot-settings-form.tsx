@@ -10,7 +10,6 @@ import { emptyCustomQuery, type CustomQuery } from "@/lib/chatbot-custom-queries
 import { emptyAvatarConfig, type BotAvatarConfig } from "@/lib/chatbot-bot-avatars";
 import {
   DEFAULT_WIDGET_POSITION,
-  WIDGET_OFFSET_DEFAULT,
   type WidgetPosition,
 } from "@/lib/chatbot-widget-position";
 import { GROQ_MODEL_OPTIONS, resolveGroqModel } from "@/lib/groq-models";
@@ -28,8 +27,6 @@ type Bot = {
   custom_queries: CustomQuery[];
   avatar_config: BotAvatarConfig;
   widget_position: WidgetPosition;
-  widget_offset_x: number;
-  widget_offset_y: number;
   trained_pages: { url: string; chars: number }[];
   last_trained_at: string | null;
 };
@@ -65,12 +62,6 @@ export default function BotSettingsForm({
   const [widgetPosition, setWidgetPosition] = useState<WidgetPosition>(
     bot.widget_position ?? DEFAULT_WIDGET_POSITION
   );
-  const [widgetOffsetX, setWidgetOffsetX] = useState(
-    bot.widget_offset_x ?? WIDGET_OFFSET_DEFAULT
-  );
-  const [widgetOffsetY, setWidgetOffsetY] = useState(
-    bot.widget_offset_y ?? WIDGET_OFFSET_DEFAULT
-  );
 
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState("");
@@ -104,8 +95,6 @@ export default function BotSettingsForm({
           custom_queries: customQueries,
           avatar_config: avatarConfig,
           widget_position: widgetPosition,
-          widget_offset_x: widgetOffsetX,
-          widget_offset_y: widgetOffsetY,
         }),
       });
       const data = await res.json();
@@ -244,14 +233,7 @@ export default function BotSettingsForm({
           botName={bot.name}
         />
 
-        <WidgetPositionPicker
-          value={widgetPosition}
-          onChange={setWidgetPosition}
-          offsetX={widgetOffsetX}
-          offsetY={widgetOffsetY}
-          onOffsetXChange={setWidgetOffsetX}
-          onOffsetYChange={setWidgetOffsetY}
-        />
+        <WidgetPositionPicker value={widgetPosition} onChange={setWidgetPosition} />
 
         {saveError && <p className="text-sm text-red-600">{saveError}</p>}
 

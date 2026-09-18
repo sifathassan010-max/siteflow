@@ -2,32 +2,18 @@
 
 import {
   WIDGET_POSITION_OPTIONS,
-  WIDGET_OFFSET_MIN,
-  WIDGET_OFFSET_MAX,
   type WidgetPosition,
 } from "@/lib/chatbot-widget-position";
 
 // The last option in the chatbot builder: which corner of the customer's
-// website the floating widget appears in, plus how far from that corner's
-// two edges it sits. Four tick-box options for the corner (only one at a
-// time), and two independent sliders for distance — horizontal and
-// vertical are separate because an owner may want the widget pulled in
-// further from the side edge than from the top/bottom edge (e.g. to clear
-// a floating "back to top" button on one axis only), or vice versa.
+// website the floating widget appears in. Four tick-box options, but only
+// one can be selected at a time — the widget can only live in one corner.
 export default function WidgetPositionPicker({
   value,
   onChange,
-  offsetX,
-  offsetY,
-  onOffsetXChange,
-  onOffsetYChange,
 }: {
   value: WidgetPosition;
   onChange: (next: WidgetPosition) => void;
-  offsetX: number;
-  offsetY: number;
-  onOffsetXChange: (next: number) => void;
-  onOffsetYChange: (next: number) => void;
 }) {
   return (
     <div>
@@ -76,41 +62,6 @@ export default function WidgetPositionPicker({
           );
         })}
       </div>
-
-      <div className="mt-4 grid gap-4 sm:max-w-xs sm:grid-cols-2">
-        <div>
-          <label className="flex items-center justify-between text-xs font-semibold text-slate">
-            <span>Distance from side</span>
-            <span className="text-ink">{offsetX}px</span>
-          </label>
-          <input
-            type="range"
-            min={WIDGET_OFFSET_MIN}
-            max={WIDGET_OFFSET_MAX}
-            value={offsetX}
-            onChange={(e) => onOffsetXChange(Number(e.target.value))}
-            className="mt-2 w-full"
-          />
-        </div>
-        <div>
-          <label className="flex items-center justify-between text-xs font-semibold text-slate">
-            <span>Distance from top/bottom</span>
-            <span className="text-ink">{offsetY}px</span>
-          </label>
-          <input
-            type="range"
-            min={WIDGET_OFFSET_MIN}
-            max={WIDGET_OFFSET_MAX}
-            value={offsetY}
-            onChange={(e) => onOffsetYChange(Number(e.target.value))}
-            className="mt-2 w-full"
-          />
-        </div>
-      </div>
-      <p className="mt-1 text-xs text-slate">
-        How far the widget sits from the corner's two edges — set
-        independently, so one side can be pulled in further than the other.
-      </p>
     </div>
   );
 }
