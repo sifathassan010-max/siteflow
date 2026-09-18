@@ -10,6 +10,7 @@ import { emptyCustomQuery, type CustomQuery } from "@/lib/chatbot-custom-queries
 import { emptyAvatarConfig, type BotAvatarConfig } from "@/lib/chatbot-bot-avatars";
 import {
   DEFAULT_WIDGET_POSITION,
+  WIDGET_OFFSET_DEFAULT,
   type WidgetPosition,
 } from "@/lib/chatbot-widget-position";
 
@@ -23,6 +24,8 @@ export default function NewBotForm({ isPaid = false }: { isPaid?: boolean }) {
   const [widgetPosition, setWidgetPosition] = useState<WidgetPosition>(
     DEFAULT_WIDGET_POSITION
   );
+  const [widgetOffsetX, setWidgetOffsetX] = useState(WIDGET_OFFSET_DEFAULT);
+  const [widgetOffsetY, setWidgetOffsetY] = useState(WIDGET_OFFSET_DEFAULT);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -42,6 +45,8 @@ export default function NewBotForm({ isPaid = false }: { isPaid?: boolean }) {
           custom_queries: customQueries,
           avatar_config: avatarConfig,
           widget_position: widgetPosition,
+          widget_offset_x: widgetOffsetX,
+          widget_offset_y: widgetOffsetY,
         }),
       });
       const data = await res.json();
@@ -124,7 +129,14 @@ export default function NewBotForm({ isPaid = false }: { isPaid?: boolean }) {
         botName={name}
       />
 
-      <WidgetPositionPicker value={widgetPosition} onChange={setWidgetPosition} />
+      <WidgetPositionPicker
+        value={widgetPosition}
+        onChange={setWidgetPosition}
+        offsetX={widgetOffsetX}
+        offsetY={widgetOffsetY}
+        onOffsetXChange={setWidgetOffsetX}
+        onOffsetYChange={setWidgetOffsetY}
+      />
 
       {error && <p className="text-sm text-red-600">{error}</p>}
 

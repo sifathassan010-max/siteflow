@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import {
   cssOffsetsForPosition,
   sanitizeWidgetPosition,
+  sanitizeWidgetOffset,
 } from "@/lib/chatbot-widget-position";
 import {
   AVATAR_DEFAULT_SIZE,
@@ -45,7 +46,7 @@ export async function GET(
 
   const { data: bot } = await admin
     .from("bots")
-    .select("widget_position, widget_color, avatar_config, name")
+    .select("widget_position, widget_offset_x, widget_offset_y, widget_color, avatar_config, name")
     .eq("id", id)
     .maybeSingle();
 
@@ -56,7 +57,9 @@ export async function GET(
   }
 
   const position = sanitizeWidgetPosition(bot.widget_position);
-  const offsets = cssOffsetsForPosition(position, 30);
+  const offsetX = sanitizeWidgetOffset(bot.widget_offset_x);
+  const offsetY = sanitizeWidgetOffset(bot.widget_offset_y);
+  const offsets = cssOffsetsForPosition(position, offsetX, offsetY);
   const embedUrl = `${origin}/embed/${id}`;
   const widgetColor = bot.widget_color || "#4f46e5";
   const botName = bot.name || "Chat";
@@ -112,7 +115,7 @@ export async function GET(
   var rotates = ${JSON.stringify(rotates)};
   var rotateMs = ${JSON.stringify(frequencySeconds)} * 1000;
   var DEFAULT_ICON_SIZE = 64; // only used when no avatar is configured
-  var AVATAR_FRAME_SIZE = 120; // fixed frame the avatar sits inside — see below
+  var AVATAR_FRAME_SIZE = ${AVATAR_MAX_SIZE}; // fixed frame the avatar sits inside — see below
 
   var wrapper = document.createElement("div");
   wrapper.id = wrapperId;
