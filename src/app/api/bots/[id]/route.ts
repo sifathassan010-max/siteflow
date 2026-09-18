@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import { isPaidForTool } from "@/lib/usage";
 import { sanitizeCustomQueries } from "@/lib/chatbot-custom-queries";
 import { sanitizeBotAvatarConfig } from "@/lib/chatbot-bot-avatars";
-import { sanitizeWidgetPosition } from "@/lib/chatbot-widget-position";
+import { sanitizeWidgetPosition, sanitizeWidgetOffset } from "@/lib/chatbot-widget-position";
 import { GROQ_MODEL_OPTIONS } from "@/lib/groq-models";
 
 // Groq models available to pick between in the widget appearance/settings
@@ -29,7 +29,7 @@ export async function GET(
   const { data: bot, error } = await supabase
     .from("bots")
     .select(
-      "id, name, persona, website_url, quick_prompts, widget_color, logo_url, escalation_contact, model, custom_queries, avatar_config, widget_position, trained_pages, last_trained_at, created_at"
+      "id, name, persona, website_url, quick_prompts, widget_color, logo_url, escalation_contact, model, custom_queries, avatar_config, widget_position, widget_offset_x, widget_offset_y, trained_pages, last_trained_at, created_at"
     )
     .eq("id", id)
     .eq("user_id", user.id)
@@ -109,6 +109,15 @@ export async function PATCH(
     update.widget_position = sanitizeWidgetPosition(body.widget_position);
   }
 
+  // Independent — an owner can change just one axis without touching the
+  // other, so each is only written when actually present in the request.
+  if (body.widget_offset_x !== undefined) {
+    update.widget_offset_x = sanitizeWidgetOffset(body.widget_offset_x);
+  }
+  if (body.widget_offset_y !== undefined) {
+    update.widget_offset_y = sanitizeWidgetOffset(body.widget_offset_y);
+  }
+
   if (Array.isArray(body.custom_queries) || (typeof body.avatar_config === "object" && body.avatar_config !== null)) {
     const isPaid = await isPaidForTool(user.id, "chatbot");
     if (Array.isArray(body.custom_queries)) {
@@ -129,7 +138,7 @@ export async function PATCH(
     .eq("id", id)
     .eq("user_id", user.id)
     .select(
-      "id, name, persona, website_url, quick_prompts, widget_color, logo_url, escalation_contact, model, custom_queries, avatar_config, widget_position, trained_pages, last_trained_at, created_at"
+      "id, name, persona, website_url, quick_prompts, widget_color, logo_url, escalation_contact, model, custom_queries, avatar_config, widget_position, widget_offset_x, widget_offset_y, trained_pages, last_trained_at, created_at"
     )
     .single();
 

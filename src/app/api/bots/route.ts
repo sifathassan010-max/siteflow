@@ -4,7 +4,7 @@ import { crawlSiteForTraining } from "@/lib/site-crawler";
 import { isPaidForTool } from "@/lib/usage";
 import { sanitizeCustomQueries } from "@/lib/chatbot-custom-queries";
 import { sanitizeBotAvatarConfig } from "@/lib/chatbot-bot-avatars";
-import { sanitizeWidgetPosition } from "@/lib/chatbot-widget-position";
+import { sanitizeWidgetPosition, sanitizeWidgetOffset } from "@/lib/chatbot-widget-position";
 
 // Multi-page crawling can take a while — give this route more room than
 // the default 10s (Vercel Hobby plan supports up to 60s via maxDuration).
@@ -61,6 +61,8 @@ export async function POST(request: Request) {
     custom_queries: customQueriesInput,
     avatar_config: avatarConfigInput,
     widget_position: widgetPositionInput,
+    widget_offset_x: widgetOffsetXInput,
+    widget_offset_y: widgetOffsetYInput,
   } = await request.json();
 
   if (!name || typeof name !== "string" || !name.trim()) {
@@ -83,6 +85,8 @@ export async function POST(request: Request) {
   const customQueries = sanitizeCustomQueries(customQueriesInput, isPaid);
   const avatarConfig = sanitizeBotAvatarConfig(avatarConfigInput, isPaid);
   const widgetPosition = sanitizeWidgetPosition(widgetPositionInput);
+  const widgetOffsetX = sanitizeWidgetOffset(widgetOffsetXInput);
+  const widgetOffsetY = sanitizeWidgetOffset(widgetOffsetYInput);
 
   let siteContent: string | null = null;
   let trainedPages: { url: string; chars: number }[] = [];
@@ -113,8 +117,12 @@ export async function POST(request: Request) {
       custom_queries: customQueries,
       avatar_config: avatarConfig,
       widget_position: widgetPosition,
+      widget_offset_x: widgetOffsetX,
+      widget_offset_y: widgetOffsetY,
     })
-    .select("id, name, persona, website_url, custom_queries, avatar_config, widget_position, created_at")
+    .select(
+      "id, name, persona, website_url, custom_queries, avatar_config, widget_position, widget_offset_x, widget_offset_y, created_at"
+    )
     .single();
 
   if (error) {
