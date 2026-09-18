@@ -158,6 +158,7 @@ function SingleAvatarSection({
           size={avatar.size}
           onChange={(size) => onChange({ ...avatar, size })}
           previewUrl={avatar.url}
+          kind={avatar.kind}
           caption={`This is how big the avatar appears in the widget header. When a visitor clicks it, it minimizes into a small circle pinned above the message box, labeled "${displayName} · Assistant".`}
         />
       )}
@@ -250,6 +251,7 @@ function MultiAvatarSection({
                   size={avatar.size}
                   onChange={(size) => updateSlot(index, { ...avatar, size })}
                   previewUrl={avatar.url}
+                  kind={avatar.kind}
                 />
               </div>
             )}
@@ -452,28 +454,48 @@ function SizePicker({
   size,
   onChange,
   previewUrl,
+  kind,
   caption,
 }: {
   size: number;
   onChange: (size: number) => void;
   previewUrl: string;
+  kind: AvatarKind;
   caption?: string;
 }) {
   return (
     <div className="rounded-lg border border-line p-3">
       <div className="flex items-center gap-4">
-        <div
-          className="flex shrink-0 items-center justify-center overflow-hidden rounded-full border border-line bg-canvas"
-          style={{ width: AVATAR_MAX_SIZE, height: AVATAR_MAX_SIZE }}
-        >
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={previewUrl}
-            alt="Avatar preview"
-            style={{ width: size, height: size }}
-            className="rounded-full object-cover transition-all"
-          />
-        </div>
+        {kind === "gif" ? (
+          // GIF: no circle/box wrapper at all — the fixed-size frame is
+          // just an invisible layout area so the row height doesn't jump
+          // as the slider changes; only the <img> itself resizes.
+          <div
+            className="flex shrink-0 items-center justify-center"
+            style={{ width: AVATAR_MAX_SIZE, height: AVATAR_MAX_SIZE }}
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={previewUrl}
+              alt="Avatar preview"
+              style={{ width: size, height: size }}
+              className="object-cover transition-all"
+            />
+          </div>
+        ) : (
+          <div
+            className="flex shrink-0 items-center justify-center overflow-hidden rounded-full border border-line bg-canvas"
+            style={{ width: AVATAR_MAX_SIZE, height: AVATAR_MAX_SIZE }}
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={previewUrl}
+              alt="Avatar preview"
+              style={{ width: size, height: size }}
+              className="rounded-full object-cover transition-all"
+            />
+          </div>
+        )}
 
         <div className="flex-1">
           <label className="text-xs font-semibold text-slate">
