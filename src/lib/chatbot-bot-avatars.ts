@@ -30,21 +30,12 @@ export type BotAvatarConfig = {
 // ones. Offered as discrete steps rather than a free-form number so every
 // value renders crisply and the slider has a sensible number of stops.
 export const AVATAR_MIN_SIZE = 40;
-export const AVATAR_MAX_SIZE = 300;
+export const AVATAR_MAX_SIZE = 120;
 const AVATAR_SIZE_STEP = 8;
-// Built as a loop (not a fixed-length Array.from) so it always lands
-// exactly on AVATAR_MAX_SIZE even when the gap between MIN and MAX isn't a
-// clean multiple of the step — otherwise the last generated value silently
-// falls short of MAX, the slider lets you drag past it, and saving that
-// size fails server-side validation and quietly reverts to the default.
-export const AVATAR_SIZE_OPTIONS: number[] = (() => {
-  const options: number[] = [];
-  for (let v = AVATAR_MIN_SIZE; v < AVATAR_MAX_SIZE; v += AVATAR_SIZE_STEP) {
-    options.push(v);
-  }
-  options.push(AVATAR_MAX_SIZE);
-  return options;
-})();
+export const AVATAR_SIZE_OPTIONS: number[] = Array.from(
+  { length: (AVATAR_MAX_SIZE - AVATAR_MIN_SIZE) / AVATAR_SIZE_STEP + 1 },
+  (_, i) => AVATAR_MIN_SIZE + i * AVATAR_SIZE_STEP
+);
 export const AVATAR_DEFAULT_SIZE = 64;
 
 // How long each avatar shows before rotating to the next one, in a
