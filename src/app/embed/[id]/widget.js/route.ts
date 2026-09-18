@@ -73,6 +73,7 @@ export async function GET(
     .filter((a) => a && a.url)
     .map((a) => ({
       url: a.url,
+      kind: a.kind === "gif" ? "gif" : "image",
       size: Math.min(
         AVATAR_MAX_SIZE,
         Math.max(AVATAR_MIN_SIZE, a.size || AVATAR_DEFAULT_SIZE)
@@ -111,7 +112,7 @@ export async function GET(
 
   var widgetColor = ${JSON.stringify(widgetColor)};
   var botName = ${JSON.stringify(botName)};
-  var avatars = ${JSON.stringify(avatars)}; // [{ url, size }], already validated server-side
+  var avatars = ${JSON.stringify(avatars)}; // [{ url, kind, size }], already validated server-side
   var rotates = ${JSON.stringify(rotates)};
   var rotateMs = ${JSON.stringify(frequencySeconds)} * 1000;
   var DEFAULT_ICON_SIZE = 64; // only used when no avatar is configured
@@ -145,21 +146,27 @@ export async function GET(
   bubble.onmouseenter = function () { bubble.style.transform = "scale(1.06)"; };
   bubble.onmouseleave = function () { bubble.style.transform = "scale(1)"; };
 
-  // The avatar itself sits inside the bubble in its own wrapper, independently
-  // scaled for the shrink/grow swap animation so it never fights with the
-  // bubble's own hover scale.
+  // The avatar itself sits inside the bubble, independently scaled for the
+  // shrink/grow swap animation so it never fights with the bubble's own
+  // hover scale.
   //
   // The BUBBLE (the button, i.e. the click target and the corner it's
   // pinned to) stays a fixed AVATAR_FRAME_SIZE square, transparent, the
-  // whole time — it never resizes as the chosen avatar size changes. This
-  // matches the size picker in the dashboard itself (bot-avatar-editor.tsx):
-  // a fixed max-size frame with the avatar image scaled up/down inside it,
-  // not a frame that grows and shrinks with the image. Only the avatarSlot
-  // — the circular image itself — is set to the owner's chosen size
-  // (40-120px) and centered inside that fixed frame. With an avatar set,
-  // the bubble also drops its brand-colour fill and shadow, so what the
-  // visitor sees is just the image/GIF floating at its chosen size, not an
-  // image inside a coloured disc that changes size with it.
+  // whole time — it never resizes as the chosen avatar size changes.
+  //
+  // Two different visuals inside it, by kind:
+  //  - "image": wrapped in avatarSlot, a small square box (overflow
+  //    hidden) that clips/crops the image — this matches the size picker
+  //    in the dashboard (bot-avatar-editor.tsx), a fixed max-size frame
+  //    with the image scaled up/down inside it.
+  //  - "gif": NO wrapper box at all. The <img> itself is resized directly
+  //    (its own width/height follow the chosen size) and appended straight
+  //    into the bubble — nothing clips or contains it. Only the size of
+  //    the GIF's own pixels changes, not a bounding box around it.
+  // Whichever one is showing, the bubble also drops its brand-colour fill
+  // and shadow, so what the visitor sees is just the image/GIF floating at
+  // its chosen size, not something inside a coloured disc that changes
+  // size with it.
   var avatarSlot = document.createElement("div");
   avatarSlot.style.borderRadius = "0"; // square, not a circular clip
   avatarSlot.style.overflow = "hidden";
@@ -169,8 +176,13 @@ export async function GET(
   avatarSlot.style.transition = "width 0.2s ease, height 0.2s ease, transform 0.25s ease";
   avatarSlot.style.transform = "scale(1)";
 
-  var avatarImg = null;
+  var avatarImg = null; // <img> inside avatarSlot, for "image" kind
+  var gifImg = null; // bare <img>, no wrapper, for "gif" kind
   var activeIndex = 0;
+
+  function activeVisualEl() {
+    return gifImg && gifImg.parentNode ? gifImg : avatarSlot;
+  }
 
   // If an avatar URL is dead (deleted from storage, a bucket that is not
   // public, or a link that is a web page rather than an image file), the
@@ -179,6 +191,8 @@ export async function GET(
   function showDefaultIcon() {
     if (rotateTimer) { clearInterval(rotateTimer); rotateTimer = null; }
     avatarImg = null;
+    if (avatarSlot.parentNode) avatarSlot.parentNode.removeChild(avatarSlot);
+    if (gifImg && gifImg.parentNode) gifImg.parentNode.removeChild(gifImg);
     bubble.innerHTML = ${JSON.stringify(defaultIconSvg)};
     bubble.style.background = widgetColor;
     bubble.style.boxShadow = "0 8px 24px rgba(0,0,0,0.22)";
@@ -189,23 +203,42 @@ export async function GET(
   function showAvatar(index) {
     var avatar = avatars[index];
     if (!avatar) return;
-    // Only the inner slot follows the chosen size — the bubble/frame stays
-    // fixed at AVATAR_FRAME_SIZE so the click target and page layout never
-    // shift as differently-sized avatars rotate in.
-    avatarSlot.style.width = avatar.size + "px";
-    avatarSlot.style.height = avatar.size + "px";
-    if (!avatarImg) {
-      avatarImg = document.createElement("img");
-      avatarImg.alt = "";
-      avatarImg.style.width = "100%";
-      avatarImg.style.height = "100%";
-      avatarImg.style.objectFit = "cover";
-      avatarImg.style.display = "block";
-      avatarImg.onerror = showDefaultIcon;
-      avatarSlot.appendChild(avatarImg);
+
+    if (avatar.kind === "gif") {
+      // No box: swap to the bare, directly-sized <img>.
+      if (avatarSlot.parentNode) bubble.removeChild(avatarSlot);
+      if (!gifImg) {
+        gifImg = document.createElement("img");
+        gifImg.alt = "";
+        gifImg.style.display = "block";
+        gifImg.style.objectFit = "cover";
+        gifImg.style.borderRadius = "0";
+        gifImg.style.transition = "width 0.2s ease, height 0.2s ease, transform 0.25s ease";
+        gifImg.style.transform = "scale(1)";
+        gifImg.onerror = showDefaultIcon;
+      }
+      if (!gifImg.parentNode) bubble.appendChild(gifImg);
+      gifImg.style.width = avatar.size + "px";
+      gifImg.style.height = avatar.size + "px";
+      gifImg.src = avatar.url;
+    } else {
+      // Image kind: boxed in avatarSlot, as before.
+      if (gifImg && gifImg.parentNode) bubble.removeChild(gifImg);
+      if (!avatarSlot.parentNode) bubble.appendChild(avatarSlot);
+      avatarSlot.style.width = avatar.size + "px";
+      avatarSlot.style.height = avatar.size + "px";
+      if (!avatarImg) {
+        avatarImg = document.createElement("img");
+        avatarImg.alt = "";
+        avatarImg.style.width = "100%";
+        avatarImg.style.height = "100%";
+        avatarImg.style.objectFit = "cover";
+        avatarImg.style.display = "block";
+        avatarImg.onerror = showDefaultIcon;
+        avatarSlot.appendChild(avatarImg);
+      }
+      avatarImg.src = avatar.url;
     }
-    // Plain <img> so GIFs keep animating natively — no extra work needed.
-    avatarImg.src = avatar.url;
   }
 
   var rotateTimer = null;
@@ -216,10 +249,9 @@ export async function GET(
     bubble.style.width = AVATAR_FRAME_SIZE + "px";
     bubble.style.height = AVATAR_FRAME_SIZE + "px";
     bubble.style.borderRadius = "0"; // a plain box — it's invisible anyway
-    bubble.style.overflow = "visible"; // never clip the (smaller-or-equal) avatarSlot
+    bubble.style.overflow = "visible"; // never clip the (smaller-or-equal) visual
     bubble.style.background = "transparent";
     bubble.style.boxShadow = "none";
-    bubble.appendChild(avatarSlot);
     showAvatar(0);
   } else {
     bubble.innerHTML = ${JSON.stringify(defaultIconSvg)};
@@ -229,12 +261,13 @@ export async function GET(
     rotateTimer = setInterval(function () {
       // Shrink the current avatar out, swap the image while invisible-small,
       // then grow the next one back in — same feel as a manual minimize/
-      // restore, just automatic.
-      avatarSlot.style.transform = "scale(0.15)";
+      // restore, just automatic. Whichever visual (boxed image or bare gif)
+      // is currently showing gets the animation.
+      activeVisualEl().style.transform = "scale(0.15)";
       setTimeout(function () {
         activeIndex = (activeIndex + 1) % avatars.length;
         showAvatar(activeIndex);
-        avatarSlot.style.transform = "scale(1)";
+        activeVisualEl().style.transform = "scale(1)";
       }, 250);
     }, rotateMs);
   }
