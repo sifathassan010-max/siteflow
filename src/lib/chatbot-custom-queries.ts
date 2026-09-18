@@ -4,6 +4,8 @@
 // create-bot form, the edit/settings form, and both API routes so the
 // client and server never disagree on shape.
 
+import { sanitizeRichHtml } from "@/lib/sanitize-rich-text";
+
 export type CustomQuery = {
   question: string;
   color: string;
