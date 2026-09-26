@@ -8,7 +8,7 @@ import { createClient } from "@/lib/supabase/server";
 export const metadata: Metadata = {
   title: "Reviews — What Our Users Say | SiteFlow",
   description:
-    "See what small business owners using SiteFlow's chatbot, SEO, forms, and analytics tools have to say about their experience.",
+    "See what small business owners using SiteFlow's chatbot tool have to say about their experience.",
   alternates: { canonical: "/reviews" },
   openGraph: {
     title: "Reviews — What Our Users Say | SiteFlow",

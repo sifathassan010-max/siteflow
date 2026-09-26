@@ -24,8 +24,8 @@ export default function RefundPage() {
           <section>
             <p>
               SiteFlow is operated by Necro Animation Studio. This Refund Policy covers paid
-              subscriptions to any SiteFlow tool (Chatbot builder, SEO, Forms &amp; Leads,
-              Analytics, or the All 4 tools bundle).
+              subscriptions to any SiteFlow tool (Chatbot builder,
+              or the API plans).
             </p>
           </section>
 

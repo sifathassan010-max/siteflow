@@ -2,16 +2,16 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import Nav from "@/components/nav";
 import SiteFooter from "@/components/site-footer";
-import { TOOL_PLANS, BUNDLE_PLAN, API_TOOL_PLANS, API_BUNDLE_PLAN } from "@/lib/pricing-data";
+import { TOOL_PLANS, API_TOOL_PLANS } from "@/lib/pricing-data";
 import { PatreonBuyButton } from "@/components/patreon-buy-button";
 
 export const metadata: Metadata = {
   title: "Pricing — Simple Plans for Small Business Website Tools | SiteFlow",
   description:
-    "See SiteFlow's pricing for the AI chatbot builder, SEO audit tool, lead-capture forms, and analytics. Start free on any tool, pay only for what you use, or bundle everything.",
+    "See SiteFlow's pricing for the AI chatbot builder. Start free, pay only for what you use.",
   alternates: { canonical: "/pricing" },
   openGraph: {
-    title: "SiteFlow Pricing — Chatbot, SEO, Forms & Analytics Plans",
+    title: "SiteFlow Pricing — Chatbot Plans",
     description: "Simple, transparent pricing for small business website tools. Start free.",
     url: "/pricing",
   },
@@ -43,12 +43,11 @@ export default function PricingPage() {
             Simple pricing
           </h1>
           <p className="mt-3 text-slate">
-            Start free on any tool. Pay only for what you use, or get
-            everything in one plan.
+            Start free on any tool. Pay only for what you use.
           </p>
         </div>
 
-        <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {TOOL_PLANS.map((plan) => (
             <div
               key={plan.name}
@@ -81,41 +80,6 @@ export default function PricingPage() {
           ))}
         </div>
 
-        <div className="mt-8 rounded-2xl border-2 border-brand bg-brand-bg p-8 sm:p-10">
-          <div className="flex flex-col items-start gap-6 sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <h3 className="text-lg font-bold text-brand">{BUNDLE_PLAN.name}</h3>
-              <p className="mt-1 text-sm text-slate">
-                Everything your website needs, one price.
-              </p>
-              <ul className="mt-4 flex flex-col gap-2 text-sm text-slate">
-                {BUNDLE_PLAN.features.map((f) => (
-                  <li key={f} className="flex items-start gap-2">
-                    <Check />
-                    {f}
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            <div className="flex shrink-0 flex-col items-start gap-3 sm:items-end">
-              <div>
-                <p className="text-4xl font-bold">
-                  ${BUNDLE_PLAN.monthlyPrice}
-                  <span className="text-base font-medium text-slate">/mo</span>
-                </p>
-              </div>
-              <Link
-                href="/login"
-                className="rounded-full border border-brand px-6 py-3 text-sm font-semibold text-brand transition hover:bg-white"
-              >
-                Start your free trial
-              </Link>
-              <PatreonBuyButton className="rounded-full bg-brand px-6 py-3 text-sm font-semibold text-white transition hover:bg-brand-hover" />
-            </div>
-          </div>
-        </div>
-
         <p className="mt-6 text-center text-sm text-slate">
           <Link href="/trust" className="underline hover:text-ink">
             Security &amp; Privacy — view our Trust Center
@@ -137,7 +101,7 @@ export default function PricingPage() {
           </p>
         </div>
 
-        <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {API_TOOL_PLANS.map((plan) => (
             <div
               key={plan.name}
@@ -171,44 +135,6 @@ export default function PricingPage() {
               />
             </div>
           ))}
-        </div>
-
-        <div className="mt-8 rounded-2xl border-2 border-brand bg-brand-bg p-8 sm:p-10">
-          <div className="flex flex-col items-start gap-6 sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <h3 className="text-lg font-bold text-brand">{API_BUNDLE_PLAN.name}</h3>
-              <p className="mt-1 text-sm text-slate">
-                One API key, every tool&apos;s endpoints unlocked.
-              </p>
-              <ul className="mt-4 flex flex-col gap-2 text-sm text-slate">
-                {API_BUNDLE_PLAN.features.map((f) => (
-                  <li key={f} className="flex items-start gap-2">
-                    <Check />
-                    {f}
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            <div className="flex shrink-0 flex-col items-start gap-3 sm:items-end">
-              <div>
-                <p className="text-4xl font-bold">
-                  ${API_BUNDLE_PLAN.monthlyPrice}
-                  <span className="text-base font-medium text-slate">/mo</span>
-                </p>
-                <p className="text-xs text-slate">
-                  {API_BUNDLE_PLAN.callsPerMonth.toLocaleString()} calls/month per tool
-                </p>
-              </div>
-              <Link
-                href="/login"
-                className="rounded-full border border-brand px-6 py-3 text-sm font-semibold text-brand transition hover:bg-white"
-              >
-                Create account
-              </Link>
-              <PatreonBuyButton className="rounded-full bg-brand px-6 py-3 text-sm font-semibold text-white transition hover:bg-brand-hover" />
-            </div>
-          </div>
         </div>
 
         <p className="mt-6 text-center text-sm text-slate">

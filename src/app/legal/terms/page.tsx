@@ -5,7 +5,7 @@ import SiteFooter from "@/components/site-footer";
 export const metadata: Metadata = {
   title: "Terms of Service | SiteFlow",
   description:
-    "The terms that govern your use of SiteFlow's chatbot builder, SEO tool, forms, and analytics.",
+    "The terms that govern your use of SiteFlow's chatbot builder.",
   alternates: { canonical: "/legal/terms" },
   robots: { index: true, follow: true },
 };
@@ -41,7 +41,7 @@ export default function TermsPage() {
             <h2 className="text-lg font-bold">2. The service</h2>
             <p className="mt-3">
               SiteFlow provides website tools for small businesses, including an AI chatbot
-              builder, an SEO audit tool, lead-capture forms, and privacy-friendly analytics.
+              builder.
               Some tools are free to use, and some are paid, as described on our{" "}
               <a href="/pricing" className="text-brand underline">
                 Pricing
@@ -69,11 +69,11 @@ export default function TermsPage() {
             <h2 className="text-lg font-bold">4. Your content</h2>
             <p className="mt-3">
               You retain ownership of the content you upload or connect to SiteFlow (for example,
-              the pages a chatbot is trained on, form submissions, or site data). You give us
+              the pages a chatbot is trained on, or site data). You give us
               permission to store, process, and transmit that content solely as needed to provide
               the service to you. You're responsible for making sure you have the right to use and
-              share any content you provide, and for how that content is used once your chatbot,
-              form, or embed is live on your website.
+              share any content you provide, and for how that content is used once your chatbot
+              or embed is live on your website.
             </p>
           </section>
 

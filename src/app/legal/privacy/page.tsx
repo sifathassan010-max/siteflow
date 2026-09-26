@@ -5,7 +5,7 @@ import SiteFooter from "@/components/site-footer";
 export const metadata: Metadata = {
   title: "Privacy Policy | SiteFlow",
   description:
-    "How SiteFlow collects, uses, and protects data from your account, your website visitors, and your chatbot, forms, and analytics.",
+    "How SiteFlow collects, uses, and protects data from your account, your website visitors, and your chatbot.",
   alternates: { canonical: "/legal/privacy" },
   robots: { index: true, follow: true },
 };
@@ -27,7 +27,7 @@ export default function PrivacyPage() {
               This Privacy Policy explains how SiteFlow, operated by Necro Animation Studio, a
               sole proprietorship based in Bangladesh, collects, uses, and protects data. It
               applies to (1) SiteFlow account holders, and (2) visitors who interact with a
-              chatbot, form, or analytics script that a SiteFlow customer has embedded on their
+              chatbot that a SiteFlow customer has embedded on their
               own website.
             </p>
           </section>
@@ -42,8 +42,7 @@ export default function PrivacyPage() {
               </li>
               <li>
                 Content you provide to configure your tools — for example, pages or text you use
-                to train a chatbot, form field definitions, or the domain you connect for
-                analytics.
+                to train a chatbot.
               </li>
               <li>
                 Subscription information: paid plans are currently processed through Patreon
@@ -58,11 +57,6 @@ export default function PrivacyPage() {
             <p className="mt-3 font-semibold">From your website visitors, on your behalf:</p>
             <ul className="mt-2 list-disc space-y-1 pl-5">
               <li>Chatbot conversations submitted through a chatbot you've embedded.</li>
-              <li>Form submissions (such as name, email, or message fields you've configured).</li>
-              <li>
-                Analytics events (such as page views and referrers) collected without cookies, for
-                sites where you've installed the SiteFlow analytics script.
-              </li>
             </ul>
             <p className="mt-3">
               For visitor data, you (the SiteFlow customer) are the party who decides what's
@@ -76,14 +70,14 @@ export default function PrivacyPage() {
             <h2 className="text-lg font-bold">2. How we use information</h2>
             <ul className="mt-3 list-disc space-y-1 pl-5">
               <li>To provide, maintain, and improve the tools you've signed up for;</li>
-              <li>To operate the chatbot, forms, and analytics features you configure;</li>
+              <li>To operate the chatbot features you configure;</li>
               <li>To process payments for paid plans;</li>
               <li>To respond to support requests sent to our support email; and</li>
               <li>To detect, prevent, and address fraud, abuse, or security issues.</li>
             </ul>
             <p className="mt-3">
               We do not sell your data, or the data collected through your embedded chatbot,
-              forms, or analytics, to third parties.
+              to third parties.
             </p>
           </section>
 
@@ -100,7 +94,7 @@ export default function PrivacyPage() {
           <section id="cookies">
             <h2 className="text-lg font-bold">4. Cookies</h2>
             <p className="mt-3">
-              Our own analytics tool is designed to work without cookies. The SiteFlow website and
+              The SiteFlow website and
               dashboard itself may use strictly necessary cookies or local storage to keep you
               logged in and remember basic preferences.
             </p>
@@ -113,7 +107,7 @@ export default function PrivacyPage() {
                 Subprocessors
               </a>{" "}
               page for links. These ad networks are never loaded on paid tool pages, the
-              dashboard, or inside any chatbot, form, or analytics widget embedded on a customer's
+              dashboard, or inside any chatbot widget embedded on a customer's
               own website.
             </p>
           </section>
@@ -131,8 +125,8 @@ export default function PrivacyPage() {
               anything described in this policy.
             </p>
             <p className="mt-3">
-              If you're a visitor to a website that uses a SiteFlow chatbot, form, or analytics
-              script and you want data about you removed, you can also contact the owner of that
+              If you're a visitor to a website that uses a SiteFlow chatbot
+              and you want data about you removed, you can also contact the owner of that
               website directly, since they control what's collected.
             </p>
           </section>
@@ -141,7 +135,7 @@ export default function PrivacyPage() {
             <h2 className="text-lg font-bold">6. Data retention</h2>
             <p className="mt-3">
               We keep account data for as long as your account is active, and chatbot
-              conversations, form submissions, and analytics data for as long as the related tool
+              conversations for as long as the related tool
               or account remains active, unless you delete it sooner or ask us to delete it. We
               may retain limited records after account closure where needed for legal, billing, or
               security reasons.

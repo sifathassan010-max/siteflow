@@ -128,7 +128,7 @@ export default function SecurityPage() {
           <p className="mt-3 text-sm leading-relaxed text-ink">
             SiteFlow uses Supabase Row Level Security (RLS) on the tables it stores data in.
             Policies are scoped so a logged-in user can only select, insert, update, or delete
-            rows tied to their own account. Public-facing widgets (chatbot, forms, and analytics
+            rows tied to their own account. Public-facing widgets (chatbot
             embeds) that need to write data on behalf of an anonymous website visitor do so
             through server-side API routes using a separate, privileged service key — that key
             is confined to server-side code (API routes and webhooks) and is never bundled into
@@ -145,9 +145,6 @@ export default function SecurityPage() {
             <li>Account information — email address, and optional profile fields (name, username, company, website URL, country).</li>
             <li>Subscription/billing status synced from Patreon (plan tier and status — not payment card details).</li>
             <li>Chatbot configuration (persona, trained website content, quick prompts, appearance) and chatbot conversation transcripts and leads submitted through a bot's widget.</li>
-            <li>Form definitions you create, and the submissions visitors make through them.</li>
-            <li>SEO projects and the scan results generated for the URLs you submit.</li>
-            <li>Analytics: page paths and referrers for sites you connect, plus a one-way daily-rotating hash of visitor IP + user agent (never the raw IP) used only to estimate unique visitors.</li>
             <li>Discussion posts and replies you choose to publish publicly on the Discussions board.</li>
           </ul>
         </section>
@@ -245,7 +242,7 @@ export default function SecurityPage() {
             Clickadilla and Monetag are only loaded on SiteFlow&apos;s free tools (meta tag
             checker, sitemap tools, chatbot preview) to help cover the cost of offering them for
             free. They are never loaded on paid tool pages, the dashboard, or inside any embedded
-            chatbot, form, or analytics widget running on a customer&apos;s own website. See our{" "}
+            chatbot widget running on a customer&apos;s own website. See our{" "}
             <a href="/legal/privacy#cookies" className="text-brand underline">
               Privacy Policy
             </a>{" "}
