@@ -1,7 +1,7 @@
-// Server-only. Reuses the SEO tool's internal-link-following logic
-// (extractInternalLinks) but pulls plain visible text per page instead of
-// running SEO scoring — this is what trains a chatbot's knowledge, not
-// what audits a page. Used on bot create and on the retrain button.
+// Server-only. Reuses the shared internal-link-following logic
+// (extractInternalLinks, in seo-audit.ts) but pulls plain visible text per
+// page instead of scoring it — this is what trains a chatbot's knowledge.
+// Used on bot create and on the retrain button.
 import * as cheerio from "cheerio";
 import { extractInternalLinks } from "./seo-audit";
 

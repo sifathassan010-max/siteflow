@@ -5,12 +5,9 @@
 // dashboard/tools top bar both read from this same file).
 // ============================================================
 
-// The 4 paid tools. Shown as top-bar links everywhere.
+// The paid tools. Shown as top-bar links everywhere.
 export const TOOLS = [
   { name: "Chatbot builder", href: "/tools/chatbot" },
-  { name: "SEO", href: "/tools/seo" },
-  { name: "Forms & Leads", href: "/tools/forms" },
-  { name: "Analytics", href: "/tools/analytics" },
 ];
 
 // Shown inside the "Free tools" dropdown.

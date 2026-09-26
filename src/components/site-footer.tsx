@@ -69,7 +69,7 @@ export default function SiteFooter() {
             Site<span className="text-brand">Flow</span>
           </Link>
           <p className="mt-3 text-sm text-slate">
-            Chatbot, forms, SEO, and analytics, built for people running a small business
+            An AI chatbot, built for people running a small business
             website, not a dev team.
           </p>
         </div>

@@ -34,14 +34,6 @@ export const TAG_GROUPS: { group: string; tags: string[] }[] = [
     ],
   },
   {
-    group: "Forms & leads",
-    tags: ["forms", "lead-generation", "embeds", "conversion-rate"],
-  },
-  {
-    group: "Analytics",
-    tags: ["analytics", "website-traffic", "privacy", "no-cookie-banner"],
-  },
-  {
     group: "Running a small business site",
     tags: [
       "small-business",

@@ -8,13 +8,12 @@
 // only counts usage_events from the start of the current month onward.
 import { createAdminClient } from "@/lib/supabase/admin";
 
-export const API_TOOLS = ["chatbot", "seo", "forms", "analytics"] as const;
+export const API_TOOLS = ["chatbot"] as const;
 export type ApiTool = (typeof API_TOOLS)[number];
 
 // Calls per month included with a single-tool API plan ($25/mo). The
-// "All Access API" plan ($55/mo) grants this same 1,000/mo allowance per
-// tool, for every tool at once — a discount on buying all four
-// individually ($100/mo), not a combined/shared pool.
+// "All Access API" plan grants this same 1,000/mo allowance per
+// tool, for every tool at once, not a combined/shared pool.
 export const MONTHLY_CALL_LIMIT = 1000;
 
 function startOfCurrentMonthIso(): string {
@@ -98,9 +97,6 @@ export async function getMonthlyApiUsageSummary(userId: string) {
 
   const summary: Record<ApiTool, { unlocked: boolean; used: number; limit: number }> = {
     chatbot: { unlocked: false, used: 0, limit: MONTHLY_CALL_LIMIT },
-    seo: { unlocked: false, used: 0, limit: MONTHLY_CALL_LIMIT },
-    forms: { unlocked: false, used: 0, limit: MONTHLY_CALL_LIMIT },
-    analytics: { unlocked: false, used: 0, limit: MONTHLY_CALL_LIMIT },
   };
 
   await Promise.all(

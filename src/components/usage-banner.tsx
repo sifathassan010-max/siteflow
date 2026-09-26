@@ -3,9 +3,6 @@ import { checkUsageLimit } from "@/lib/usage";
 
 const UNIT_LABEL: Record<string, string> = {
   chatbot: "messages",
-  seo: "pages scanned",
-  forms: "submissions",
-  analytics: "pageviews",
 };
 
 // Drop this at the top of any paid tool's main page.tsx (right under the

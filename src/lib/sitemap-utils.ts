@@ -282,8 +282,9 @@ export async function discoverSitemaps(rootUrl: URL): Promise<
 }
 
 // Breadth-first crawl of internal links starting at rootUrl, used by the
-// sitemap generator. Deliberately reuses the SEO tool's link-extraction
-// logic rather than re-implementing HTML parsing.
+// sitemap generator. Deliberately reuses the shared link-extraction logic
+// (extractInternalLinks, in seo-audit.ts) rather than re-implementing HTML
+// parsing.
 export async function crawlSiteForSitemap(
   rootUrl: string,
   maxPages: number

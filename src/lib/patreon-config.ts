@@ -14,10 +14,7 @@ export const PATREON_JOIN_URL = "https://www.patreon.com/15895599/join";
 
 export const TIER_TOOL_MAP: Record<string, string[]> = {
   "chatbot builder": ["chatbot"],
-  "seo tool": ["seo"],
-  "forms & lead capture": ["forms"],
-  analytics: ["analytics"],
-  "all access": ["chatbot", "seo", "forms", "analytics"],
+  "all access": ["chatbot"],
 };
 
 // Turns a list of Patreon tier titles a patron currently has into
@@ -38,14 +35,10 @@ export function tiersToUnlockedTools(tierTitles: string[]): string[] {
 // the dashboard. Sold and billed separately from the tiers above, so a
 // customer can have dashboard access, API access, both, or neither.
 // $25/mo = 1,000 calls/mo for that one tool's API.
-// $55/mo (All Access API) = 1,000 calls/mo for EACH of the four tools.
 // ============================================================
 export const TIER_API_TOOL_MAP: Record<string, string[]> = {
   "chatbot api": ["chatbot"],
-  "seo api": ["seo"],
-  "forms api": ["forms"],
-  "analytics api": ["analytics"],
-  "all access api": ["chatbot", "seo", "forms", "analytics"],
+  "all access api": ["chatbot"],
 };
 
 export function tiersToUnlockedApiTools(tierTitles: string[]): string[] {

@@ -30,56 +30,7 @@ export const TOOL_PLANS: PricingPlan[] = [
       "Full conversation history log",
     ],
   },
-  {
-    name: "SEO tool",
-    monthlyPrice: 25,
-    quarterlyPrice: 60,
-    features: [
-      "0–100 page score with a specific issue list",
-      "Title & meta description checks",
-      "Heading (H1) structure check",
-      "Image alt-text coverage check",
-      "Canonical, Open Graph & viewport tag checks",
-      "Thin-content / word-count check",
-      "Multi-page crawl, not just one URL",
-    ],
-  },
-  {
-    name: "Forms & Lead Capture",
-    monthlyPrice: 25,
-    quarterlyPrice: 60,
-    features: [
-      "Drag-and-reorder form builder",
-      "6 field types: text, email, phone, long text, dropdown, checkbox",
-      "Required-field toggling",
-      "Embeddable form widget, copy-paste install",
-      "Submissions table to view & manage leads",
-    ],
-  },
-  {
-    name: "Analytics",
-    monthlyPrice: 25,
-    quarterlyPrice: 60,
-    features: [
-      "Pageviews & unique visitor counts",
-      "Pageviews-by-day chart",
-      "Top pages report",
-      "Top referrers report",
-      "7 / 30 / 90-day view toggle",
-      "Lightweight embeddable tracking script",
-    ],
-  },
 ];
-
-export const BUNDLE_PLAN: PricingPlan = {
-  name: "All 4 tools",
-  monthlyPrice: 55,
-  quarterlyPrice: 149,
-  features: [
-    "Everything in all 4 tools above",
-    // Add more bundle-only perks here if you want any.
-  ],
-};
 
 // ============================================================
 // API PLANS — for developers and AI agents calling SiteFlow's tools
@@ -103,32 +54,5 @@ export const API_TOOL_PLANS: ApiPricingPlan[] = [
     callsPerMonth: 1000,
     features: ["Query one of your trained bots", "Structured JSON replies", "1,000 calls/month"],
   },
-  {
-    name: "SEO API",
-    monthlyPrice: 25,
-    callsPerMonth: 1000,
-    features: ["Single-page SEO audit", "Score + issue list as JSON", "1,000 calls/month"],
-  },
-  {
-    name: "Forms API",
-    monthlyPrice: 25,
-    callsPerMonth: 1000,
-    features: ["Retrieve form submissions/leads", "Structured JSON", "1,000 calls/month"],
-  },
-  {
-    name: "Analytics API",
-    monthlyPrice: 25,
-    callsPerMonth: 1000,
-    features: ["Pageviews & top pages summary", "Structured JSON", "1,000 calls/month"],
-  },
 ];
 
-export const API_BUNDLE_PLAN: ApiPricingPlan = {
-  name: "All Access API",
-  monthlyPrice: 55,
-  callsPerMonth: 1000,
-  features: [
-    "1,000 calls/month for EACH of the 4 tools above",
-    "One API key, every endpoint",
-  ],
-};
