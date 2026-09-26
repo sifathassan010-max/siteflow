@@ -10,6 +10,14 @@ create table if not exists bot_conversations (
   last_message_at timestamptz not null default now()
 );
 
+-- Explicit Data API grants for bot_conversations (required from Oct 30, 2026 —
+-- Supabase stops auto-granting these for newly created tables; RLS
+-- policies elsewhere in this file still govern actual row access, this just lets the
+-- Data API reach the table at all).
+grant select, insert, update, delete on public.bot_conversations to anon;
+grant select, insert, update, delete on public.bot_conversations to authenticated;
+grant select, insert, update, delete on public.bot_conversations to service_role;
+
 -- One (bot, visitor_session) pair is always the same conversation.
 create unique index if not exists bot_conversations_bot_session_idx
   on bot_conversations (bot_id, visitor_session);
@@ -24,6 +32,14 @@ create table if not exists bot_messages (
   content text not null,
   created_at timestamptz not null default now()
 );
+
+-- Explicit Data API grants for bot_messages (required from Oct 30, 2026 —
+-- Supabase stops auto-granting these for newly created tables; RLS
+-- policies elsewhere in this file still govern actual row access, this just lets the
+-- Data API reach the table at all).
+grant select, insert, update, delete on public.bot_messages to anon;
+grant select, insert, update, delete on public.bot_messages to authenticated;
+grant select, insert, update, delete on public.bot_messages to service_role;
 
 create index if not exists bot_messages_conversation_idx
   on bot_messages (conversation_id, created_at);

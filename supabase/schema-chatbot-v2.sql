@@ -33,6 +33,14 @@ create table if not exists bot_leads (
   created_at timestamptz not null default now()
 );
 
+-- Explicit Data API grants for bot_leads (required from Oct 30, 2026 —
+-- Supabase stops auto-granting these for newly created tables; RLS
+-- policies elsewhere in this file still govern actual row access, this just lets the
+-- Data API reach the table at all).
+grant select, insert, update, delete on public.bot_leads to anon;
+grant select, insert, update, delete on public.bot_leads to authenticated;
+grant select, insert, update, delete on public.bot_leads to service_role;
+
 create index if not exists bot_leads_bot_idx on bot_leads (bot_id, created_at desc);
 
 alter table bot_leads enable row level security;

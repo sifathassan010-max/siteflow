@@ -25,6 +25,14 @@ create table if not exists api_keys (
   created_at timestamptz not null default now()
 );
 
+-- Explicit Data API grants for api_keys (required from Oct 30, 2026 —
+-- Supabase stops auto-granting these for newly created tables; RLS
+-- policies elsewhere in this file still govern actual row access, this just lets the
+-- Data API reach the table at all).
+grant select, insert, update, delete on public.api_keys to anon;
+grant select, insert, update, delete on public.api_keys to authenticated;
+grant select, insert, update, delete on public.api_keys to service_role;
+
 create index if not exists api_keys_user_id_idx on api_keys (user_id);
 create index if not exists api_keys_key_hash_idx on api_keys (key_hash);
 

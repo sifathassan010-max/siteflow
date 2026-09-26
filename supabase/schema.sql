@@ -8,6 +8,14 @@ create table if not exists profiles (
   created_at timestamptz not null default now()
 );
 
+-- Explicit Data API grants for profiles (required from Oct 30, 2026 —
+-- Supabase stops auto-granting these for newly created tables; RLS
+-- policies elsewhere in this file still govern actual row access, this just lets the
+-- Data API reach the table at all).
+grant select, insert, update, delete on public.profiles to anon;
+grant select, insert, update, delete on public.profiles to authenticated;
+grant select, insert, update, delete on public.profiles to service_role;
+
 -- Which plan/tier a user is on, synced from Patreon webhooks later
 create table if not exists subscriptions (
   id uuid primary key default gen_random_uuid(),
@@ -22,6 +30,14 @@ create table if not exists subscriptions (
   unique(user_id)
 );
 
+-- Explicit Data API grants for subscriptions (required from Oct 30, 2026 —
+-- Supabase stops auto-granting these for newly created tables; RLS
+-- policies elsewhere in this file still govern actual row access, this just lets the
+-- Data API reach the table at all).
+grant select, insert, update, delete on public.subscriptions to anon;
+grant select, insert, update, delete on public.subscriptions to authenticated;
+grant select, insert, update, delete on public.subscriptions to service_role;
+
 -- Per-tool usage counters, checked server-side to enforce trial/free limits
 create table if not exists usage_events (
   id uuid primary key default gen_random_uuid(),
@@ -31,6 +47,14 @@ create table if not exists usage_events (
   quantity int not null default 1,
   created_at timestamptz not null default now()
 );
+
+-- Explicit Data API grants for usage_events (required from Oct 30, 2026 —
+-- Supabase stops auto-granting these for newly created tables; RLS
+-- policies elsewhere in this file still govern actual row access, this just lets the
+-- Data API reach the table at all).
+grant select, insert, update, delete on public.usage_events to anon;
+grant select, insert, update, delete on public.usage_events to authenticated;
+grant select, insert, update, delete on public.usage_events to service_role;
 
 create index if not exists usage_events_user_tool_idx on usage_events (user_id, tool, created_at);
 

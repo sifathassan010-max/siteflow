@@ -8,6 +8,14 @@ create table if not exists analytics_sites (
   created_at timestamptz not null default now()
 );
 
+-- Explicit Data API grants for analytics_sites (required from Oct 30, 2026 —
+-- Supabase stops auto-granting these for newly created tables; RLS
+-- policies elsewhere in this file still govern actual row access, this just lets the
+-- Data API reach the table at all).
+grant select, insert, update, delete on public.analytics_sites to anon;
+grant select, insert, update, delete on public.analytics_sites to authenticated;
+grant select, insert, update, delete on public.analytics_sites to service_role;
+
 create table if not exists analytics_events (
   id uuid primary key default gen_random_uuid(),
   site_id uuid not null references analytics_sites(id) on delete cascade,
@@ -19,6 +27,14 @@ create table if not exists analytics_events (
   visitor_hash text,
   created_at timestamptz not null default now()
 );
+
+-- Explicit Data API grants for analytics_events (required from Oct 30, 2026 —
+-- Supabase stops auto-granting these for newly created tables; RLS
+-- policies elsewhere in this file still govern actual row access, this just lets the
+-- Data API reach the table at all).
+grant select, insert, update, delete on public.analytics_events to anon;
+grant select, insert, update, delete on public.analytics_events to authenticated;
+grant select, insert, update, delete on public.analytics_events to service_role;
 
 create index if not exists analytics_sites_user_id_idx on analytics_sites (user_id);
 create index if not exists analytics_events_site_id_idx on analytics_events (site_id, created_at);

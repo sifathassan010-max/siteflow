@@ -47,6 +47,14 @@ create table if not exists testimonials (
   reviewed_by uuid references auth.users(id)
 );
 
+-- Explicit Data API grants for testimonials (required from Oct 30, 2026 —
+-- Supabase stops auto-granting these for newly created tables; RLS
+-- policies elsewhere in this file still govern actual row access, this just lets the
+-- Data API reach the table at all).
+grant select, insert, update, delete on public.testimonials to anon;
+grant select, insert, update, delete on public.testimonials to authenticated;
+grant select, insert, update, delete on public.testimonials to service_role;
+
 create index if not exists testimonials_user_id_idx on testimonials (user_id);
 create index if not exists testimonials_status_idx on testimonials (status, created_at desc);
 -- Speeds up the public /reviews + homepage queries specifically.

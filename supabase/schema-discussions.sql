@@ -21,6 +21,14 @@ create table if not exists discussion_threads (
   constraint tag_count check (array_length(tags, 1) between 5 and 10)
 );
 
+-- Explicit Data API grants for discussion_threads (required from Oct 30, 2026 —
+-- Supabase stops auto-granting these for newly created tables; RLS
+-- policies elsewhere in this file still govern actual row access, this just lets the
+-- Data API reach the table at all).
+grant select, insert, update, delete on public.discussion_threads to anon;
+grant select, insert, update, delete on public.discussion_threads to authenticated;
+grant select, insert, update, delete on public.discussion_threads to service_role;
+
 create table if not exists discussion_replies (
   id uuid primary key default gen_random_uuid(),
   thread_id uuid not null references discussion_threads(id) on delete cascade,
@@ -29,6 +37,14 @@ create table if not exists discussion_replies (
   body text not null,
   created_at timestamptz not null default now()
 );
+
+-- Explicit Data API grants for discussion_replies (required from Oct 30, 2026 —
+-- Supabase stops auto-granting these for newly created tables; RLS
+-- policies elsewhere in this file still govern actual row access, this just lets the
+-- Data API reach the table at all).
+grant select, insert, update, delete on public.discussion_replies to anon;
+grant select, insert, update, delete on public.discussion_replies to authenticated;
+grant select, insert, update, delete on public.discussion_replies to service_role;
 
 create index if not exists discussion_threads_created_at_idx on discussion_threads (created_at desc);
 create index if not exists discussion_threads_tags_idx on discussion_threads using gin (tags);
