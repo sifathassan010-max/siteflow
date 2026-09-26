@@ -7,14 +7,14 @@ import TestimonialCard from "@/components/testimonial-card";
 import { createClient } from "@/lib/supabase/server";
 
 export const metadata: Metadata = {
-  title: "Website Toolkit for Small Business: AI Chatbot, SEO, Forms & Analytics | SiteFlow",
+  title: "Website Chatbot for Small Business: AI Chatbot Builder | SiteFlow",
   description:
-    "SiteFlow bundles an AI chatbot trained on your own content, a small-business SEO audit tool, lead-capture forms, and cookie-free analytics into one login. Free to try on every tool.",
+    "SiteFlow gives you an AI chatbot trained on your own content, one login, free to try.",
   alternates: { canonical: "/" },
   openGraph: {
-    title: "Website Toolkit for Small Business Websites | SiteFlow",
+    title: "Website Chatbot for Small Business Websites | SiteFlow",
     description:
-      "AI chatbot, SEO audit, lead-capture forms, and privacy-friendly analytics — one flow for small business websites.",
+      "AI chatbot, trained on your own content — for small business websites.",
     url: "/",
   },
 };
@@ -25,24 +25,6 @@ const TOOLS = [
     tagline: "Train an AI chatbot on your own site content and answer visitors instantly, day or night.",
     href: "/tools/chatbot",
     color: "brand" as const,
-  },
-  {
-    name: "Forms & Leads",
-    tagline: "Drag-and-drop forms plus on-site capture widgets that turn visitors into leads.",
-    href: "/tools/forms",
-    color: "flow" as const,
-  },
-  {
-    name: "SEO",
-    tagline: "Scan your pages, catch what's holding back your ranking, fix it before customers bounce.",
-    href: "/tools/seo",
-    color: "brand" as const,
-  },
-  {
-    name: "Analytics",
-    tagline: "Privacy-friendly traffic insight, no cookie banner required, no data sold.",
-    href: "/tools/analytics",
-    color: "flow" as const,
   },
 ];
 
@@ -69,7 +51,7 @@ export default async function Home() {
             One flow. Every tool your website needs to turn visitors into customers.
           </h1>
           <p className="mx-auto mt-5 max-w-xl text-lg text-slate">
-            Chatbot, forms, SEO, and analytics, built for people running a small
+            An AI chatbot, built for people running a small
             business site, not a dev team.
           </p>
 
@@ -96,9 +78,9 @@ export default async function Home() {
         <section className="border-y border-line bg-white py-16">
           <div className="mx-auto max-w-7xl px-6">
             <h2 className="text-center text-2xl font-bold tracking-tight">
-              Four tools. One login. One price if you want it all.
+              One tool. One login. Free to try.
             </h2>
-            <div className="mt-10 grid gap-5 sm:grid-cols-2">
+            <div className="mx-auto mt-10 grid max-w-md gap-5">
               {TOOLS.map((tool) => (
                 <Link
                   key={tool.href}

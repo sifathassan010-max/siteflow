@@ -2,8 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { NextResponse } from "next/server";
 import { normalizeUrlInput, crawlSiteForSitemap, buildSitemapXml } from "@/lib/sitemap-utils";
 
-// Free tier keeps the crawl small — the paid SEO tool's crawler goes
-// deeper. This just needs to be enough for a small marketing site.
+// Free tier keeps the crawl small — enough for a small marketing site.
 const MAX_PAGES = 150;
 
 export async function POST(request: Request) {

@@ -8,7 +8,7 @@ import { TAG_GROUPS } from "@/lib/discussion-tags";
 export const metadata: Metadata = {
   title: "Discussions — Ask Questions & Share Tips for Small Business Websites | SiteFlow",
   description:
-    "Browse threads from small business website owners on chatbots, SEO, lead forms, and analytics — read without an account, or log in to post your own.",
+    "Browse threads from small business website owners on chatbots — read without an account, or log in to post your own.",
   alternates: { canonical: "/discussions" },
   openGraph: {
     title: "SiteFlow Discussions — Community Q&A for Small Business Websites",

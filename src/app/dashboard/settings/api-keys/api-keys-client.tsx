@@ -15,16 +15,10 @@ type ApiKey = {
 type ToolUsage = { unlocked: boolean; used: number; limit: number };
 type UsageSummary = {
   chatbot: ToolUsage;
-  seo: ToolUsage;
-  forms: ToolUsage;
-  analytics: ToolUsage;
 };
 
 const TOOL_LABELS: Record<keyof UsageSummary, string> = {
   chatbot: "Chatbot API",
-  seo: "SEO API",
-  forms: "Forms API",
-  analytics: "Analytics API",
 };
 
 const ALL_TOOLS = Object.keys(TOOL_LABELS) as (keyof UsageSummary)[];

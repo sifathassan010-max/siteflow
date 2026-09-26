@@ -5,9 +5,6 @@ import Link from "next/link";
 
 const TOOLS = [
   { name: "Chatbot builder", href: "/tools/chatbot", desc: "Answer visitors with an AI chatbot" },
-  { name: "SEO", href: "/tools/seo", desc: "Scan and improve your pages" },
-  { name: "Forms & Leads", href: "/tools/forms", desc: "Capture leads from your site" },
-  { name: "Analytics", href: "/tools/analytics", desc: "See your traffic, privacy-friendly" },
 ];
 
 export default async function DashboardPage() {

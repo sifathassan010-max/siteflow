@@ -11,11 +11,11 @@ import ServiceWorkerCleanup from "@/components/service-worker-cleanup";
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "SiteFlow — AI Chatbot, SEO, Forms & Analytics for Small Business Websites",
+    default: "SiteFlow — AI Chatbot for Small Business Websites",
     template: "%s",
   },
   description:
-    "SiteFlow is an all-in-one toolkit for small business websites: an AI chatbot trained on your own content, an SEO audit tool, lead-capture forms, and privacy-friendly analytics — one login, one flow.",
+    "SiteFlow gives small business websites an AI chatbot trained on your own content — one login, one flow.",
   openGraph: {
     siteName: "SiteFlow",
     type: "website",
