@@ -47,11 +47,11 @@ export default function PricingPage() {
           </p>
         </div>
 
-        <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-12 flex flex-wrap justify-center gap-5">
           {TOOL_PLANS.map((plan) => (
             <div
               key={plan.name}
-              className="flex flex-col rounded-2xl border border-line bg-white p-6"
+              className="flex w-full max-w-sm flex-1 flex-col rounded-2xl border border-line bg-white p-6 sm:min-w-[280px]"
             >
               <h3 className="font-bold">{plan.name}</h3>
               <p className="mt-3 text-3xl font-bold">
@@ -101,11 +101,11 @@ export default function PricingPage() {
           </p>
         </div>
 
-        <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-10 flex flex-wrap justify-center gap-5">
           {API_TOOL_PLANS.map((plan) => (
             <div
               key={plan.name}
-              className="flex flex-col rounded-2xl border border-line bg-white p-6"
+              className="flex w-full max-w-sm flex-1 flex-col rounded-2xl border border-line bg-white p-6 sm:min-w-[280px]"
             >
               <h3 className="font-bold">{plan.name}</h3>
               <p className="mt-3 text-3xl font-bold">
