@@ -97,25 +97,29 @@ export async function POST(request: Request) {
     const webhookSecret = process.env.AFFILIATE_WEBHOOK_SECRET;
     if (webhookUrl && webhookSecret) {
       const membershipId = (payload.data?.id as string | undefined) ?? crypto.randomUUID();
-      fetch(webhookUrl, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "x-siteflow-webhook-secret": webhookSecret,
-        },
-        body: JSON.stringify({
-          slug: profile.referred_by_slug,
-          customerEmail: email,
-          occurredAt: new Date().toISOString(),
-          // Dedupe key so a Patreon retry of this same webhook delivery
-          // never double-credits the affiliate.
-          sourceEventId: `patreon:${membershipId}:${event}`,
-        }),
-      }).catch(() => {
-        // Best-effort. If this fails, tomorrow's reconciliation cron on the
-        // affiliate site will still pick this customer up as long as their
-        // subscription is active when it runs.
-      });
+      // Must be awaited: on Vercel the function is frozen as soon as the
+      // response is returned, so a fire-and-forget fetch can get dropped.
+      try {
+        await fetch(webhookUrl, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "x-siteflow-webhook-secret": webhookSecret,
+          },
+          body: JSON.stringify({
+            slug: profile.referred_by_slug,
+            customerEmail: email,
+            occurredAt: new Date().toISOString(),
+            // Dedupe key so a Patreon retry of this same webhook delivery
+            // never double-credits the affiliate.
+            sourceEventId: `patreon:${membershipId}:${event}`,
+          }),
+          signal: AbortSignal.timeout(5000),
+        });
+      } catch {
+        // Best-effort. If this fails, the affiliate site's daily
+        // reconciliation cron still picks this customer up.
+      }
     }
   }
 
