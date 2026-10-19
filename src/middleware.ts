@@ -8,6 +8,12 @@ import { NextResponse, type NextRequest } from "next/server";
 // each form redirecting to /login on a 401 response.
 const PROTECTED_PREFIXES = ["/dashboard"];
 
+// Affiliate attribution: captures ?ref=SLUG from any incoming URL (e.g. an
+// affiliate's link) into a long-lived cookie so we know who to credit if this
+// visitor registers later. Read back in src/app/register/page.tsx.
+const REF_COOKIE = "sf_ref";
+const REF_COOKIE_DAYS = 90;
+
 export async function middleware(request: NextRequest) {
   let response = NextResponse.next({ request });
 
@@ -45,6 +51,18 @@ export async function middleware(request: NextRequest) {
     const loginUrl = new URL("/login", request.url);
     loginUrl.searchParams.set("next", request.nextUrl.pathname);
     return NextResponse.redirect(loginUrl);
+  }
+
+  const ref = request.nextUrl.searchParams.get("ref");
+  if (ref) {
+    const clean = ref.trim().toLowerCase().slice(0, 64);
+    if (/^[a-z0-9-]{2,64}$/.test(clean)) {
+      response.cookies.set(REF_COOKIE, clean, {
+        maxAge: REF_COOKIE_DAYS * 24 * 60 * 60,
+        path: "/",
+        sameSite: "lax",
+      });
+    }
   }
 
   return response;
