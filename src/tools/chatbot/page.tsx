@@ -1,0 +1,106 @@
+import type { Metadata } from "next";
+import { createClient } from "@/lib/supabase/server";
+import Link from "next/link";
+import DashboardShell from "@/components/dashboard-shell";
+import PublicToolShell from "@/components/public-tool-shell";
+import UsageBanner from "@/components/usage-banner";
+import NewBotForm from "./new-bot-form";
+import { isPaidForTool } from "@/lib/usage";
+
+export const metadata: Metadata = {
+  title: "AI Chatbot Builder for Small Business Websites | SiteFlow",
+  description:
+    "Train an AI chatbot on your own website content and answer visitor questions instantly, day or night. No code required — set up a bot for your small business site in minutes.",
+  alternates: { canonical: "/tools/chatbot" },
+  openGraph: {
+    title: "AI Chatbot Builder for Small Business Websites | SiteFlow",
+    description: "Train an AI chatbot on your own site content and answer visitors instantly.",
+    url: "/tools/chatbot",
+  },
+};
+
+const INTRO = (
+  <>
+    <h1 className="text-2xl font-bold">Chatbot builder</h1>
+    <p className="mt-2 max-w-lg text-slate">
+      Create a bot with a name, a persona/instructions, and — optionally —
+      your website URL so it can answer from your own content. Each bot
+      gets its own embeddable widget you can drop into any site.
+    </p>
+  </>
+);
+
+export default async function ChatbotBuilderPage() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return (
+      <PublicToolShell>
+        {INTRO}
+        <p className="mt-4 rounded-xl border border-dashed border-line bg-white p-4 text-sm text-slate">
+          You&apos;re viewing this without an account. Fill in the form below
+          to try it — you&apos;ll be asked to log in when you create your
+          first bot.
+        </p>
+        <div className="mt-6 max-w-md">
+          <NewBotForm isPaid={false} />
+        </div>
+      </PublicToolShell>
+    );
+  }
+
+  const [{ data: bots }, isPaid] = await Promise.all([
+    supabase
+      .from("bots")
+      .select("id, name, website_url, created_at")
+      .eq("user_id", user.id)
+      .order("created_at", { ascending: false }),
+    isPaidForTool(user.id, "chatbot"),
+  ]);
+
+  return (
+    <DashboardShell email={user.email ?? ""}>
+      {INTRO}
+
+      <UsageBanner userId={user.id} tool="chatbot" />
+
+      <div className="mt-8 grid gap-8 lg:grid-cols-[1fr_320px]">
+        <div>
+          <h2 className="text-sm font-semibold text-slate">Your bots</h2>
+
+          {!bots || bots.length === 0 ? (
+            <p className="mt-3 rounded-xl border border-dashed border-line p-6 text-sm text-slate">
+              No bots yet — create your first one to the right.
+            </p>
+          ) : (
+            <ul className="mt-3 flex flex-col gap-3">
+              {bots.map((bot) => (
+                <li key={bot.id}>
+                  <Link
+                    href={`/tools/chatbot/${bot.id}`}
+                    className="block rounded-xl border border-line bg-white p-4 transition hover:border-ink/30"
+                  >
+                    <p className="font-semibold">{bot.name}</p>
+                    <p className="mt-1 text-sm text-slate">
+                      {bot.website_url ? bot.website_url : "No website attached"}
+                    </p>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+
+        <div>
+          <h2 className="text-sm font-semibold text-slate">Create a new bot</h2>
+          <div className="mt-3">
+            <NewBotForm isPaid={isPaid} />
+          </div>
+        </div>
+      </div>
+    </DashboardShell>
+  );
+}
