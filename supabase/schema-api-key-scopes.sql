@@ -1,0 +1,13 @@
+-- API key scoping: lets a customer create a key limited to just one (or a
+-- few) of their unlocked API tools, instead of every key on the account
+-- always getting every tool the account plan covers. Run once in
+-- Supabase SQL Editor, after schema-api-access.sql. Safe to re-run.
+--
+-- Empty array ('{}', the default) means "unscoped" — the key gets access
+-- to whatever tools are active on the account (api_unlocked_tools), which
+-- is exactly today's behavior. This keeps every key created before this
+-- migration working exactly as before. A non-empty array restricts that
+-- specific key to the intersection of its scopes and the account's active
+-- tools, so revoking/downgrading the account plan still wins even if a
+-- key was scoped to a tool the account no longer has.
+alter table api_keys add column if not exists scopes text[] not null default '{}';
