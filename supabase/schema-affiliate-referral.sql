@@ -6,7 +6,6 @@
 alter table public.profiles
   add column if not exists referred_by_slug text;
 
-grant select, insert, update, delete on public.profiles to anon;
 grant select, insert, update, delete on public.profiles to authenticated;
 grant select, insert, update, delete on public.profiles to service_role;
 
@@ -22,7 +21,8 @@ begin
       new.email,
       new.raw_user_meta_data->>'username',
       new.raw_user_meta_data->>'full_name',
-      new.raw_user_meta_data->>'referred_by_slug'
+      case when new.raw_user_meta_data->>'referred_by_slug' ~ '^[a-z0-9-]{2,64}$'
+           then new.raw_user_meta_data->>'referred_by_slug' else null end
     );
   insert into public.subscriptions (user_id, tier, status, trial_ends_at)
     values (new.id, 'free', 'trialing', now() + interval '7 days');
