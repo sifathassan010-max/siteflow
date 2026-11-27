@@ -1,5 +1,8 @@
 import { createClient } from "@/lib/supabase/server";
 import { DEFAULT_GROQ_MODEL } from "@/lib/groq-models";
+import { checkPreviewAllowance } from "@/lib/chat-limits";
+import { extractTokenUsage } from "@/lib/chat-limits-core";
+import { logUsage } from "@/lib/usage";
 import { NextResponse } from "next/server";
 
 const SYSTEM_PROMPT = `You are a friendly, helpful AI chatbot demo for SiteFlow.
@@ -27,6 +30,14 @@ export async function POST(request: Request) {
 
   if (message.length > 500) {
     return NextResponse.json({ error: "Message too long for the demo" }, { status: 400 });
+  }
+
+  const preview = await checkPreviewAllowance(user.id);
+  if (!preview.allowed) {
+    return NextResponse.json(
+      { error: `Daily demo limit reached (${preview.limit} messages). Try again after 00:00 UTC.` },
+      { status: 429, headers: { "Retry-After": String(preview.retryAfterSeconds) } }
+    );
   }
 
   const apiKey = process.env.GROQ_API_KEY;
@@ -65,12 +76,13 @@ export async function POST(request: Request) {
     const data = await res.json();
     const reply = data.choices?.[0]?.message?.content ?? "Sorry, I couldn't come up with a reply.";
 
-    await supabase.from("usage_events").insert({
-      user_id: user.id,
-      tool: "free_chatbot_preview",
-      event_type: "message",
-      quantity: 1,
-    });
+    await logUsage(
+      user.id,
+      "free_chatbot_preview",
+      "message",
+      1,
+      extractTokenUsage(data, DEFAULT_GROQ_MODEL)
+    );
 
     return NextResponse.json({ reply });
   } catch (err) {

@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { NextResponse } from "next/server";
 import * as cheerio from "cheerio";
+import { safeFetch, SafeFetchError } from "@/lib/safe-fetch";
 
 export async function POST(request: Request) {
   const supabase = await createClient();
@@ -18,21 +19,13 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Missing url" }, { status: 400 });
   }
 
-  let target: URL;
-  try {
-    target = new URL(url);
-    if (!["http:", "https:"].includes(target.protocol)) {
-      throw new Error("bad protocol");
-    }
-  } catch {
-    return NextResponse.json({ error: "That doesn't look like a valid URL" }, { status: 400 });
-  }
-
   let html: string;
+  let finalUrl: string;
   try {
-    const res = await fetch(target.toString(), {
+    const res = await safeFetch(url.trim(), {
       headers: { "User-Agent": "SiteFlow-MetaChecker/1.0" },
-      signal: AbortSignal.timeout(10000),
+      timeoutMs: 10000,
+      maxBytes: 2_000_000,
     });
     if (!res.ok) {
       return NextResponse.json(
@@ -40,8 +33,15 @@ export async function POST(request: Request) {
         { status: 400 }
       );
     }
-    html = await res.text();
-  } catch {
+    html = res.text;
+    finalUrl = res.url;
+  } catch (err) {
+    if (err instanceof SafeFetchError && (err.code === "blocked" || err.code === "invalid_url")) {
+      return NextResponse.json(
+        { error: "That doesn't look like a valid public URL" },
+        { status: 400 }
+      );
+    }
     return NextResponse.json(
       { error: "Couldn't reach that URL. Check it's correct and publicly accessible." },
       { status: 400 }
@@ -79,7 +79,7 @@ export async function POST(request: Request) {
   });
 
   return NextResponse.json({
-    url: target.toString(),
+    url: finalUrl,
     title: { value: title, check: checkLength(title, 30, 60) },
     description: { value: description, check: checkLength(description, 120, 160) },
     ogTitle: { value: ogTitle, present: !!ogTitle },

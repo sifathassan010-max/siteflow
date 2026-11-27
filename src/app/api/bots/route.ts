@@ -1,6 +1,8 @@
 import { createClient } from "@/lib/supabase/server";
 import { NextResponse } from "next/server";
 import { crawlSiteForTraining } from "@/lib/site-crawler";
+import { buildTrainingData, type TrainingData } from "@/lib/training-core";
+import { crawlNotes, maxPagesFor, normalizeWebsiteInput, storeChunks } from "@/lib/training";
 import { isPaidForTool } from "@/lib/usage";
 import { sanitizeCustomQueries } from "@/lib/chatbot-custom-queries";
 import { sanitizeBotAvatarConfig } from "@/lib/chatbot-bot-avatars";
@@ -8,14 +10,7 @@ import { sanitizeWidgetPosition, sanitizeWidgetOffset } from "@/lib/chatbot-widg
 
 // Multi-page crawling can take a while — give this route more room than
 // the default 10s (Vercel Hobby plan supports up to 60s via maxDuration).
-export const maxDuration = 60;
-
-// Keep this generous but bounded — it gets pasted into every chat request
-// as context, so bigger isn't free (costs tokens on every message).
-const MAX_SITE_CONTENT_CHARS = 12000;
-
-// How many pages to follow from the root URL when training a new bot.
-const MAX_TRAINING_PAGES = 5;
+export const maxDuration = 60; // 40s crawl budget + chunking/saving
 
 // Soft cap so one account can't spin up unlimited bots during testing.
 // Bump this later if you want tiered limits per plan.
@@ -88,17 +83,16 @@ export async function POST(request: Request) {
   const widgetOffsetX = sanitizeWidgetOffset(widgetOffsetXInput);
   const widgetOffsetY = sanitizeWidgetOffset(widgetOffsetYInput);
 
-  let siteContent: string | null = null;
-  let trainedPages: { url: string; chars: number }[] = [];
-  if (websiteUrl && typeof websiteUrl === "string" && websiteUrl.trim()) {
-    const { combinedText, pages } = await crawlSiteForTraining(
-      websiteUrl.trim(),
-      MAX_TRAINING_PAGES
-    );
-    if (combinedText) {
-      siteContent = combinedText.slice(0, MAX_SITE_CONTENT_CHARS);
-      trainedPages = pages;
-    }
+  const websiteNormalized = normalizeWebsiteInput(websiteUrl);
+  const maxPages = maxPagesFor(isPaid);
+  let training: TrainingData | null = null;
+  let notes: string[] = [];
+  let rootError: string | null = null;
+  if (websiteNormalized) {
+    const crawl = await crawlSiteForTraining(websiteNormalized, maxPages);
+    if (crawl.pagesText.length > 0) training = buildTrainingData(crawl.pagesText);
+    notes = crawlNotes(crawl, training, maxPages);
+    rootError = crawl.rootError;
   }
 
   const { data: bot, error } = await supabase
@@ -110,10 +104,14 @@ export async function POST(request: Request) {
         persona && typeof persona === "string" && persona.trim()
           ? persona.trim()
           : "You are a helpful, friendly assistant for this business.",
-      website_url: websiteUrl && typeof websiteUrl === "string" ? websiteUrl.trim() : null,
-      site_content: siteContent,
-      trained_pages: trainedPages,
-      last_trained_at: siteContent ? new Date().toISOString() : null,
+      website_url: websiteNormalized,
+      site_content: training ? training.siteContent : null,
+      // Starts as 'full' (always safe); flipped to 'chunked' below once the
+      // chunks are saved.
+      content_mode: "full",
+      content_chars: training ? training.totalChars : 0,
+      trained_pages: training ? training.pages : [],
+      last_trained_at: training ? new Date().toISOString() : null,
       custom_queries: customQueries,
       avatar_config: avatarConfig,
       widget_position: widgetPosition,
@@ -129,13 +127,37 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
+  let mode: "full" | "chunked" = "full";
+  if (training && training.mode === "chunked") {
+    const stored = await storeChunks(bot.id, training.chunks);
+    if (stored) {
+      const { error: modeError } = await supabase
+        .from("bots")
+        .update({ content_mode: "chunked", core_content: training.coreContent })
+        .eq("id", bot.id)
+        .eq("user_id", user.id);
+      if (!modeError) mode = "chunked";
+    }
+    if (mode !== "chunked") {
+      notes.push("Large-site search is temporarily unavailable, so the bot is using the first part of your content only.");
+    }
+  }
+
+  if (websiteNormalized && !training) {
+    notes.push(
+      rootError
+        ? `Bot created, but couldn't crawl that URL (${rootError}). It'll answer from its persona only. You can retrain later.`
+        : "Bot created, but couldn't crawl that URL — it'll answer from its persona only. You can edit it later."
+    );
+  }
+
   return NextResponse.json({
     bot,
-    crawled: siteContent !== null,
-    pagesTrained: trainedPages.length,
-    note:
-      websiteUrl && siteContent === null
-        ? "Bot created, but couldn't crawl that URL — it'll answer from its persona only. You can edit it later."
-        : undefined,
+    crawled: training !== null,
+    pagesTrained: training ? training.pages.length : 0,
+    maxPages,
+    mode,
+    notes,
+    note: notes.length > 0 ? notes.join(" ") : undefined,
   });
 }

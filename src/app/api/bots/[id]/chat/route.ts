@@ -1,37 +1,13 @@
 import { createClient } from "@/lib/supabase/server";
-import { checkUsageLimit, logUsage } from "@/lib/usage";
+import { logUsage } from "@/lib/usage";
+import { checkChatAllowance } from "@/lib/chat-limits";
+import { extractTokenUsage, ownerCapMessage } from "@/lib/chat-limits-core";
 import { resolveGroqModel } from "@/lib/groq-models";
+import { loadKnowledge } from "@/lib/chat-context";
+import { loadProductSection } from "@/lib/product-context";
+import { extractHosts, restrictReplyLinks } from "@/lib/safe-links";
+import { buildBotSystemPrompt } from "@/lib/training-core";
 import { NextResponse } from "next/server";
-
-function buildSystemPrompt(
-  persona: string,
-  siteContent: string | null,
-  escalationContact: string | null
-) {
-  let prompt = persona;
-
-  if (siteContent) {
-    prompt += `
-
-You have the following information about the business's website. Use it to
-answer questions accurately. If something isn't covered by this content,
-say you're not sure rather than making it up.
-
---- WEBSITE CONTENT ---
-${siteContent}
---- END WEBSITE CONTENT ---`;
-  }
-
-  if (escalationContact) {
-    prompt += `
-
-If you don't know the answer, or the visitor asks to speak to a real
-person, tell them they can reach the business directly at
-${escalationContact} instead of guessing.`;
-  }
-
-  return prompt;
-}
 
 export async function POST(
   request: Request,
@@ -49,7 +25,7 @@ export async function POST(
 
   const { data: bot } = await supabase
     .from("bots")
-    .select("id, user_id, persona, site_content, model, escalation_contact")
+    .select("id, user_id, persona, site_content, content_mode, core_content, model, escalation_contact, product_count, shop_url")
     .eq("id", id)
     .eq("user_id", user.id)
     .maybeSingle();
@@ -66,13 +42,19 @@ export async function POST(
     return NextResponse.json({ error: "Message too long" }, { status: 400 });
   }
 
-  const usage = await checkUsageLimit(user.id, "chatbot");
-  if (!usage.allowed) {
+  const allowance = await checkChatAllowance(user.id);
+  if (!allowance.allowed) {
+    if (allowance.kind === "trial_exhausted") {
+      return NextResponse.json(
+        {
+          error: `You've used your ${allowance.limit} trial messages for the chatbot tool. Upgrade to keep testing.`,
+        },
+        { status: 402 }
+      );
+    }
     return NextResponse.json(
-      {
-        error: `You've used your ${usage.limit} trial messages for the chatbot tool. Upgrade to keep testing.`,
-      },
-      { status: 402 }
+      { error: ownerCapMessage(allowance.reason), code: "owner_cap" },
+      { status: 429, headers: { "Retry-After": String(allowance.retryAfterSeconds) } }
     );
   }
 
@@ -82,6 +64,9 @@ export async function POST(
   }
 
   try {
+    const knowledge = await loadKnowledge(bot, message, null);
+    const productSection = await loadProductSection(bot, message, null);
+    const systemPrompt = buildBotSystemPrompt(bot.persona, knowledge, bot.escalation_contact, productSection);
     const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -93,7 +78,7 @@ export async function POST(
         messages: [
           {
             role: "system",
-            content: buildSystemPrompt(bot.persona, bot.site_content, bot.escalation_contact),
+            content: systemPrompt,
           },
           { role: "user", content: message },
         ],
@@ -113,9 +98,11 @@ export async function POST(
     }
 
     const data = await res.json();
-    const reply = data.choices?.[0]?.message?.content ?? "Sorry, I couldn't come up with a reply.";
+    let reply: string = data.choices?.[0]?.message?.content ?? "Sorry, I couldn't come up with a reply.";
+    if (productSection) reply = restrictReplyLinks(reply, extractHosts(systemPrompt));
 
-    await logUsage(user.id, "chatbot", "dashboard_test_message");
+    const tokens = extractTokenUsage(data, resolveGroqModel(bot.model));
+    await logUsage(user.id, "chatbot", "dashboard_test_message", 1, tokens);
 
     return NextResponse.json({ reply });
   } catch (err) {

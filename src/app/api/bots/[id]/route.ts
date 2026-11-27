@@ -29,7 +29,7 @@ export async function GET(
   const { data: bot, error } = await supabase
     .from("bots")
     .select(
-      "id, name, persona, website_url, quick_prompts, widget_color, logo_url, escalation_contact, model, custom_queries, avatar_config, widget_position, widget_offset_x, widget_offset_y, trained_pages, last_trained_at, created_at"
+      "id, name, persona, website_url, quick_prompts, widget_color, logo_url, escalation_contact, model, custom_queries, avatar_config, widget_position, widget_offset_x, widget_offset_y, trained_pages, last_trained_at, content_mode, content_chars, created_at"
     )
     .eq("id", id)
     .eq("user_id", user.id)
@@ -138,7 +138,7 @@ export async function PATCH(
     .eq("id", id)
     .eq("user_id", user.id)
     .select(
-      "id, name, persona, website_url, quick_prompts, widget_color, logo_url, escalation_contact, model, custom_queries, avatar_config, widget_position, widget_offset_x, widget_offset_y, trained_pages, last_trained_at, created_at"
+      "id, name, persona, website_url, quick_prompts, widget_color, logo_url, escalation_contact, model, custom_queries, avatar_config, widget_position, widget_offset_x, widget_offset_y, trained_pages, last_trained_at, content_mode, content_chars, created_at"
     )
     .single();
 

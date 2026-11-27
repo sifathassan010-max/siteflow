@@ -1,5 +1,11 @@
 import { createAdminClient } from "@/lib/supabase/admin";
-import { tiersToUnlockedTools, tiersToUnlockedApiTools } from "@/lib/patreon-config";
+import {
+  tiersToUnlockedTools,
+  tiersToUnlockedApiTools,
+  isReferralTierTitle,
+} from "@/lib/patreon-config";
+import { resolvePaidAmount } from "@/lib/patreon-amount";
+import { sendAffiliatePing, flagReferralTier } from "@/lib/affiliate-ping";
 import { NextResponse } from "next/server";
 import crypto from "crypto";
 
@@ -59,6 +65,7 @@ export async function POST(request: Request) {
   let unlockedTools: string[] = [];
   let unlockedApiTools: string[] = [];
   let status: "active" | "canceled" = "active";
+  let tierTitles: string[] = [];
 
   if (event === "members:pledge:delete") {
     // Pledge canceled — revoke everything, dashboard AND API access.
@@ -67,7 +74,7 @@ export async function POST(request: Request) {
     status = "canceled";
   } else {
     // Find all tier titles this member is currently entitled to.
-    const tierTitles = included
+    tierTitles = included
       .filter((item) => item.type === "tier")
       .map((item) => (item.attributes?.title as string) ?? "");
     unlockedTools = tiersToUnlockedTools(tierTitles);
@@ -75,6 +82,8 @@ export async function POST(request: Request) {
     status = unlockedTools.length > 0 || unlockedApiTools.length > 0 ? "active" : "canceled";
   }
 
+  // 1) Access first, using only columns that have always existed — a
+  //    problem with the newer billing columns below can never block access.
   await supabase
     .from("subscriptions")
     .update({
@@ -85,41 +94,59 @@ export async function POST(request: Request) {
     })
     .eq("user_id", profile.id);
 
-  // Affiliate commission notification — fire-and-forget ping to the private
+  const hasChatbot = status === "active" && unlockedTools.includes("chatbot");
+  const isReferralTier = hasChatbot && tierTitles.some((t) => isReferralTierTitle(t));
+  const paid = hasChatbot ? resolvePaidAmount(payload, tierTitles) : null;
+
+  // 2) What the customer actually pays (cents) + tier name, for affiliate
+  //    commission. Best-effort: needs schema-chatbot-v12.sql; if that was not
+  //    run the update just errors and is ignored.
+  await supabase
+    .from("subscriptions")
+    .update({
+      paid_amount_cents: paid ? paid.cents : null,
+      paid_amount_source: paid ? paid.source : null,
+      tier_title: hasChatbot ? tierTitles.filter(Boolean).join(", ").slice(0, 200) : null,
+    })
+    .eq("user_id", profile.id);
+
+  // Referral-tier guard: someone on the cheaper referral tier with NO
+  // referrer on their account keeps full access (never lock a paying
+  // customer) but is flagged for owner review, and no affiliate ping goes out.
+  if (isReferralTier && !profile.referred_by_slug) {
+    await flagReferralTier(supabase, {
+      userId: profile.id,
+      email,
+      tierTitle: tierTitles.filter((t) => isReferralTierTitle(t))[0] ?? "",
+      reason: "no_referrer",
+      paidAmountCents: paid ? paid.cents : null,
+    });
+  }
+
+  // Affiliate commission notification — ping to the private
   // siteflow-affiliates site so it can credit whoever referred this person,
   // the instant their pledge goes active for the chatbot builder plan.
   // Ongoing monthly renewals are caught separately by that site's own daily
-  // reconciliation cron (see /api/affiliates/export-active-subscriptions
-  // below) since Patreon's webhook doesn't cleanly signal "this month's
-  // charge succeeded" the way a Stripe invoice.paid event would.
-  if (profile.referred_by_slug && status === "active" && unlockedTools.includes("chatbot")) {
-    const webhookUrl = process.env.AFFILIATE_WEBHOOK_URL;
-    const webhookSecret = process.env.AFFILIATE_WEBHOOK_SECRET;
-    if (webhookUrl && webhookSecret) {
-      const membershipId = (payload.data?.id as string | undefined) ?? crypto.randomUUID();
-      // Must be awaited: on Vercel the function is frozen as soon as the
-      // response is returned, so a fire-and-forget fetch can get dropped.
-      try {
-        await fetch(webhookUrl, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "x-siteflow-webhook-secret": webhookSecret,
-          },
-          body: JSON.stringify({
-            slug: profile.referred_by_slug,
-            customerEmail: email,
-            occurredAt: new Date().toISOString(),
-            // Dedupe key so a Patreon retry of this same webhook delivery
-            // never double-credits the affiliate.
-            sourceEventId: `patreon:${membershipId}:${event}`,
-          }),
-          signal: AbortSignal.timeout(5000),
-        });
-      } catch {
-        // Best-effort. If this fails, the affiliate site's daily
-        // reconciliation cron still picks this customer up.
-      }
+  // reconciliation cron (see /api/affiliates/export-active-subscriptions)
+  // since Patreon's webhook doesn't cleanly signal "this month's charge
+  // succeeded" the way a Stripe invoice.paid event would.
+  if (profile.referred_by_slug && hasChatbot && paid) {
+    const membershipId = (payload.data?.id as string | undefined) ?? crypto.randomUUID();
+    const ping = await sendAffiliatePing({
+      slug: profile.referred_by_slug,
+      customerEmail: email,
+      sourceEventId: `patreon:${membershipId}:${event}`,
+      paidAmountCents: paid.cents,
+      paidSource: paid.source,
+    });
+    if (isReferralTier && ping.matched === false) {
+      await flagReferralTier(supabase, {
+        userId: profile.id,
+        email,
+        tierTitle: tierTitles.filter((t) => isReferralTierTitle(t))[0] ?? "",
+        reason: "affiliate_not_matched",
+        paidAmountCents: paid.cents,
+      });
     }
   }
 

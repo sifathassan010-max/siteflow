@@ -9,8 +9,8 @@ import crypto from "crypto";
 // this to top up recurring monthly commissions even when Patreon's webhook
 // doesn't fire a clean "renewed this month" event.
 //
-// Deliberately minimal: no names, no plan pricing, nothing beyond what's
-// needed to attribute and dedupe a commission. Protected by a shared
+// Deliberately minimal: no names, nothing beyond what's needed to attribute
+// a commission and compute it (the amount the customer actually pays). Protected by a shared
 // secret — set the SAME value for AFFILIATE_EXPORT_SECRET here and
 // SITEFLOW_EXPORT_SECRET on the affiliate site.
 
@@ -31,23 +31,44 @@ export async function GET(request: Request) {
 
   const supabase = createAdminClient();
 
-  const { data, error } = await supabase
-    .from("profiles")
-    .select("email, referred_by_slug, subscriptions!inner(status, unlocked_tools, updated_at)")
-    .not("referred_by_slug", "is", null)
-    .eq("subscriptions.status", "active");
-
-  if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
-  }
-
+  type Sub = {
+    status: string;
+    unlocked_tools: string[];
+    updated_at: string;
+    paid_amount_cents?: number | null;
+    paid_amount_source?: string | null;
+  };
   type Row = {
     email: string;
     referred_by_slug: string;
-    subscriptions: { status: string; unlocked_tools: string[]; updated_at: string } | { status: string; unlocked_tools: string[]; updated_at: string }[];
+    subscriptions: Sub | Sub[];
   };
 
-  const active = (data as Row[])
+  // Newer columns (schema-chatbot-v12.sql) first; if they do not exist yet
+  // fall back to the old select so the daily cron never breaks.
+  let rows: Row[] | null = null;
+  const withAmount = await supabase
+    .from("profiles")
+    .select(
+      "email, referred_by_slug, subscriptions!inner(status, unlocked_tools, updated_at, paid_amount_cents, paid_amount_source)"
+    )
+    .not("referred_by_slug", "is", null)
+    .eq("subscriptions.status", "active");
+  if (!withAmount.error) {
+    rows = withAmount.data as unknown as Row[];
+  } else {
+    const legacy = await supabase
+      .from("profiles")
+      .select("email, referred_by_slug, subscriptions!inner(status, unlocked_tools, updated_at)")
+      .not("referred_by_slug", "is", null)
+      .eq("subscriptions.status", "active");
+    if (legacy.error) {
+      return NextResponse.json({ error: legacy.error.message }, { status: 500 });
+    }
+    rows = legacy.data as unknown as Row[];
+  }
+
+  const active = rows
     .map((row) => {
       const sub = Array.isArray(row.subscriptions) ? row.subscriptions[0] : row.subscriptions;
       return { email: row.email, slug: row.referred_by_slug, sub };
@@ -57,6 +78,14 @@ export async function GET(request: Request) {
       customerEmail: row.email,
       slug: row.slug,
       updatedAt: row.sub!.updated_at,
+      // What this customer pays per month (USD cents), as last recorded from
+      // Patreon. null = unknown (old row from before Stage 4); the affiliate
+      // site then uses the default full price and marks the row as such.
+      paidAmountCents: row.sub!.paid_amount_cents ?? null,
+      // 'simulate' (test-simulate route) is a real amount, just not from Patreon:
+      // report it as 'payload' so the affiliate ledger does not mislabel it 'default'.
+      amountSource:
+        row.sub!.paid_amount_source === "simulate" ? "payload" : row.sub!.paid_amount_source ?? null,
     }));
 
   return NextResponse.json({ ok: true, generatedAt: new Date().toISOString(), active });
