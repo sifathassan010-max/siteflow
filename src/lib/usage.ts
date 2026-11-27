@@ -65,14 +65,36 @@ export async function isPaidForTool(userId: string, tool: string): Promise<boole
   );
 }
 
+export type UsageMeta = {
+  model?: string | null;
+  promptTokens?: number | null;
+  completionTokens?: number | null;
+};
+
 export async function logUsage(
   userId: string,
   tool: string,
   eventType: string,
-  quantity = 1
+  quantity = 1,
+  meta?: UsageMeta
 ) {
   const supabase = createAdminClient();
-  await supabase
-    .from("usage_events")
-    .insert({ user_id: userId, tool, event_type: eventType, quantity });
+  const base = { user_id: userId, tool, event_type: eventType, quantity };
+
+  if (meta) {
+    // prompt_tokens / completion_tokens / model come from
+    // supabase/schema-chatbot-v9.sql. If that hasn't been run yet, fall back
+    // to a plain insert so the message is STILL counted against the caps.
+    const { error } = await supabase.from("usage_events").insert({
+      ...base,
+      model: meta.model ?? null,
+      prompt_tokens: meta.promptTokens ?? null,
+      completion_tokens: meta.completionTokens ?? null,
+    });
+    if (!error) return;
+    console.error("usage_events insert with token columns failed, retrying plain:", error.message);
+  }
+
+  const { error } = await supabase.from("usage_events").insert(base);
+  if (error) console.error("usage_events insert failed:", error.message);
 }

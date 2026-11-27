@@ -3,6 +3,7 @@
 // public sitemaps.org protocol — not copied from any third-party tool.
 import * as cheerio from "cheerio";
 import { extractInternalLinks } from "./seo-audit";
+import { safeFetch, SafeFetchError } from "./safe-fetch";
 
 export const FETCH_TIMEOUT_MS = 10000;
 export const USER_AGENT = "SiteFlow-SitemapTools/1.0";
@@ -54,23 +55,25 @@ export type FetchResult =
 
 export async function fetchText(url: string): Promise<FetchResult> {
   try {
-    const res = await fetch(url, {
+    const res = await safeFetch(url, {
       headers: { "User-Agent": USER_AGENT, Accept: "application/xml, text/xml, */*" },
-      signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
+      timeoutMs: FETCH_TIMEOUT_MS,
+      maxBytes: MAX_XML_CHARS,
     });
     if (!res.ok) {
       return { ok: false, error: `That URL returned an error (status ${res.status})` };
     }
-    const text = await res.text();
-    const truncated = text.length > MAX_XML_CHARS;
     return {
       ok: true,
-      text: truncated ? text.slice(0, MAX_XML_CHARS) : text,
+      text: res.text,
       status: res.status,
-      contentType: res.headers.get("content-type") ?? "",
-      truncated,
+      contentType: res.contentType,
+      truncated: res.truncated,
     };
-  } catch {
+  } catch (err) {
+    if (err instanceof SafeFetchError && (err.code === "blocked" || err.code === "invalid_url")) {
+      return { ok: false, error: "That URL can't be fetched. Use a public http(s) address." };
+    }
     return { ok: false, error: "Couldn't reach that URL. Check it's correct and publicly accessible." };
   }
 }
@@ -264,10 +267,10 @@ export async function discoverSitemaps(rootUrl: URL): Promise<
     const candidate = `${rootUrl.origin}${path}`;
     if (candidates.has(candidate)) continue;
     try {
-      const res = await fetch(candidate, {
-        method: "GET",
+      const res = await safeFetch(candidate, {
         headers: { "User-Agent": USER_AGENT },
-        signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
+        timeoutMs: FETCH_TIMEOUT_MS,
+        maxBytes: 200_000, // only checking that it exists
       });
       if (res.ok) {
         candidates.add(candidate);
@@ -300,15 +303,15 @@ export async function crawlSiteForSitemap(
     visited.add(normalized);
 
     try {
-      const res = await fetch(next, {
+      const res = await safeFetch(next, {
         headers: { "User-Agent": USER_AGENT },
-        signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
+        timeoutMs: FETCH_TIMEOUT_MS,
+        maxBytes: 2_000_000,
+        requireContentType: /html/i,
       });
-      if (!res.ok) continue;
-      const contentType = res.headers.get("content-type") ?? "";
-      if (!contentType.includes("html")) continue;
+      if (!res.ok || res.bodySkipped) continue;
 
-      const html = await res.text();
+      const html = res.text;
       pages.push(next);
 
       if (pages.length < maxPages) {

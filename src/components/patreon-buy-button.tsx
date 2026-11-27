@@ -1,16 +1,20 @@
 "use client";
 
 import { useState } from "react";
-import { PATREON_JOIN_URL } from "@/lib/patreon-config";
+import { PATREON_JOIN_URL, PATREON_REFERRAL_JOIN_URL } from "@/lib/patreon-config";
 
 // First click reveals a short notice explaining the Patreon checkout.
 // Second click on the same button follows through to Patreon.
 export function PatreonBuyButton({
   className,
   wrapperClassName,
+  referral = false,
 }: {
   className: string;
   wrapperClassName?: string;
+  // true = go to the referral tier's Patreon page ($35.99). Only passed by
+  // /pricing for affiliate visitors once PATREON_REFERRAL_JOIN_URL is set.
+  referral?: boolean;
 }) {
   const [expanded, setExpanded] = useState(false);
 
@@ -20,7 +24,11 @@ export function PatreonBuyButton({
         type="button"
         onClick={() => {
           if (expanded) {
-            window.open(PATREON_JOIN_URL, "_blank", "noopener,noreferrer");
+            const url =
+              referral && PATREON_REFERRAL_JOIN_URL.startsWith("https://")
+                ? PATREON_REFERRAL_JOIN_URL
+                : PATREON_JOIN_URL;
+            window.open(url, "_blank", "noopener,noreferrer");
           } else {
             setExpanded(true);
           }

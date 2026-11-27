@@ -1,4 +1,4 @@
-import { COUNTRIES } from "./countries";
+import { COUNTRIES } from "./countries.ts";
 
 export type ProfileFormInput = {
   full_name?: unknown;

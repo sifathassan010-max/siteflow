@@ -4,7 +4,7 @@
 // test runner, not as part of the app bundle.
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { validateProfileInput } from "./profile-validation";
+import { validateProfileInput } from "./profile-validation.ts";
 
 test("all fields empty is valid — nothing is mandatory", () => {
   const result = validateProfileInput({});

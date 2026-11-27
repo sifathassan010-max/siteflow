@@ -8,18 +8,23 @@
 export type PricingPlan = {
   name: string;
   monthlyPrice: number;
-  quarterlyPrice: number; // price for 3 months, billed once
+  // Price shown ONLY to visitors who arrived through an affiliate link
+  // (sf_ref cookie / referred account) AND only once the referral Patreon
+  // tier is configured. Sold as a separate Patreon tier.
+  referralMonthlyPrice?: number;
   features: string[]; // <-- TYPE YOUR FEATURE BULLET POINTS HERE
 };
 
 export const TOOL_PLANS: PricingPlan[] = [
   {
     name: "Chatbot builder",
-    monthlyPrice: 25,
-    quarterlyPrice: 60,
+    monthlyPrice: 39.99,
+    referralMonthlyPrice: 35.99,
     features: [
       // Add/remove lines freely, each becomes one bullet point.
-      "Trains automatically on your website content",
+      "15,000 messages per month, up to 500 per day",
+      "Trains automatically on up to 16 pages of your website",
+      "Animated GIF / rotating avatar on the chat bubble",
       "Custom persona & instructions",
       "Fast or thorough AI model, your choice",
       "Up to 6 quick-prompt suggestion buttons",
