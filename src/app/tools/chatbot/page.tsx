@@ -4,6 +4,7 @@ import Link from "next/link";
 import DashboardShell from "@/components/dashboard-shell";
 import PublicToolShell from "@/components/public-tool-shell";
 import UsageBanner from "@/components/usage-banner";
+import ChatUsageMeter from "@/components/chat-usage-meter";
 import NewBotForm from "./new-bot-form";
 import { isPaidForTool } from "@/lib/usage";
 
@@ -66,6 +67,7 @@ export default async function ChatbotBuilderPage() {
       {INTRO}
 
       <UsageBanner userId={user.id} tool="chatbot" />
+      <ChatUsageMeter userId={user.id} />
 
       <div className="mt-8 grid gap-8 lg:grid-cols-[1fr_320px]">
         <div>

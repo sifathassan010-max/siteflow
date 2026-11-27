@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import ChatMessageText from "@/components/chat-message-text";
 
 type ConversationSummary = {
   id: string;
@@ -109,13 +110,14 @@ export default function ConversationHistory({ botId }: { botId: string }) {
                     <div
                       key={m.id}
                       className={
-                        "max-w-[85%] rounded-2xl px-4 py-2 text-sm " +
+                        "max-w-[85%] whitespace-pre-wrap break-words rounded-2xl px-4 py-2 text-sm " +
                         (m.role === "user"
                           ? "self-end bg-brand text-white"
                           : "self-start bg-white text-ink")
                       }
                     >
-                      {m.content}
+                      {/* only the bot's replies get clickable links; visitor text stays plain */}
+                      {m.role === "assistant" ? <ChatMessageText text={m.content} /> : m.content}
                     </div>
                   ))}
                 </div>

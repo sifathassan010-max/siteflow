@@ -4,6 +4,9 @@ import Nav from "@/components/nav";
 import SiteFooter from "@/components/site-footer";
 import { TOOL_PLANS, API_TOOL_PLANS } from "@/lib/pricing-data";
 import { PatreonBuyButton } from "@/components/patreon-buy-button";
+import { cookies } from "next/headers";
+import { createClient } from "@/lib/supabase/server";
+import { isReferralTierConfigured } from "@/lib/patreon-config";
 
 export const metadata: Metadata = {
   title: "Pricing — Simple Plans for Small Business Website Tools | SiteFlow",
@@ -32,7 +35,38 @@ function Check() {
   );
 }
 
-export default function PricingPage() {
+// Is this visitor an affiliate-referred one? Either they arrived through a
+// ?ref= link (sf_ref cookie, set in src/middleware.ts) or they are logged in
+// with an account that was referred. Never throws: any failure = not referred.
+async function isReferredVisitor(): Promise<boolean> {
+  try {
+    const jar = await cookies();
+    const ref = jar.get("sf_ref")?.value ?? "";
+    if (/^[a-z0-9-]{2,64}$/.test(ref)) return true;
+    const supabase = await createClient();
+    const { data: auth } = await supabase.auth.getUser();
+    if (!auth.user) return false;
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("referred_by_slug")
+      .eq("id", auth.user.id)
+      .maybeSingle();
+    return !!profile?.referred_by_slug;
+  } catch {
+    return false;
+  }
+}
+
+function money(n: number) {
+  return n.toFixed(2);
+}
+
+export default async function PricingPage() {
+  // The $35.99 price is only ever shown when the referral Patreon tier is
+  // really set up (name + join URL in patreon-config.ts); otherwise a visitor
+  // could see a price they cannot buy.
+  const showReferralPrice = isReferralTierConfigured() && (await isReferredVisitor());
+
   return (
     <div className="min-h-screen">
       <Nav />
@@ -54,10 +88,23 @@ export default function PricingPage() {
               className="flex w-full max-w-sm flex-1 flex-col rounded-2xl border border-line bg-white p-6 sm:min-w-[280px]"
             >
               <h3 className="font-bold">{plan.name}</h3>
-              <p className="mt-3 text-3xl font-bold">
-                ${plan.monthlyPrice}
-                <span className="text-base font-medium text-slate">/mo</span>
-              </p>
+              {showReferralPrice && plan.referralMonthlyPrice !== undefined ? (
+                <p className="mt-3 text-3xl font-bold">
+                  ${money(plan.referralMonthlyPrice)}
+                  <span className="text-base font-medium text-slate">/mo</span>
+                  <span className="ml-2 text-base font-medium text-slate line-through">
+                    ${money(plan.monthlyPrice)}
+                  </span>
+                </p>
+              ) : (
+                <p className="mt-3 text-3xl font-bold">
+                  ${money(plan.monthlyPrice)}
+                  <span className="text-base font-medium text-slate">/mo</span>
+                </p>
+              )}
+              {showReferralPrice && plan.referralMonthlyPrice !== undefined && (
+                <p className="mt-1 text-xs text-slate">Referral price — applied through the referral plan on Patreon.</p>
+              )}
               <ul className="mt-4 flex flex-1 flex-col gap-2 text-sm text-slate">
                 {plan.features.map((f) => (
                   <li key={f} className="flex items-start gap-2">
@@ -73,6 +120,7 @@ export default function PricingPage() {
                 Start free trial
               </Link>
               <PatreonBuyButton
+                referral={showReferralPrice && plan.referralMonthlyPrice !== undefined}
                 wrapperClassName="mt-2"
                 className="w-full rounded-full bg-brand px-4 py-2 text-center text-sm font-semibold text-white transition hover:bg-brand-hover"
               />

@@ -111,8 +111,10 @@ export default function NewBotForm({ isPaid = false }: { isPaid?: boolean }) {
           className="mt-1 w-full rounded-lg border border-line px-3 py-2 text-sm"
         />
         <p className="mt-1 text-xs text-slate">
-          If given, we&apos;ll crawl this page so the bot can answer from your
-          own content.
+          If given, we&apos;ll crawl up to {isPaid ? 16 : 5} pages of your site
+          (starting from this one) so the bot can answer from your own content.
+          {isPaid ? "" : " Paid plans train on up to 16 pages."} Crawling can
+          take up to a minute.
         </p>
       </div>
 
@@ -145,7 +147,7 @@ export default function NewBotForm({ isPaid = false }: { isPaid?: boolean }) {
         disabled={loading}
         className="rounded-lg bg-brand px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-hover disabled:opacity-50"
       >
-        {loading ? "Creating…" : "Create bot"}
+        {loading ? "Creating… (crawling can take up to a minute)" : "Create bot"}
       </button>
     </form>
   );

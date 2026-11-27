@@ -14,6 +14,7 @@ import {
   type WidgetPosition,
 } from "@/lib/chatbot-widget-position";
 import { GROQ_MODEL_OPTIONS, resolveGroqModel } from "@/lib/groq-models";
+import ShopifyProductsPanel, { type StoreInfo } from "./shopify-products-panel";
 
 type Bot = {
   id: string;
@@ -32,6 +33,8 @@ type Bot = {
   widget_offset_y: number;
   trained_pages: { url: string; chars: number }[];
   last_trained_at: string | null;
+  content_mode?: "full" | "chunked";
+  content_chars?: number;
 };
 
 // Sourced from @/lib/groq-models so this list can never drift out of sync
@@ -41,9 +44,11 @@ const MODEL_OPTIONS = GROQ_MODEL_OPTIONS;
 export default function BotSettingsForm({
   bot,
   isPaid = false,
+  store = null,
 }: {
   bot: Bot;
   isPaid?: boolean;
+  store?: StoreInfo | null;
 }) {
   const router = useRouter();
 
@@ -78,6 +83,10 @@ export default function BotSettingsForm({
 
   const [retraining, setRetraining] = useState(false);
   const [retrainError, setRetrainError] = useState("");
+  const [retrainNotes, setRetrainNotes] = useState<string[]>([]);
+  const [contentMode, setContentMode] = useState(bot.content_mode ?? "full");
+  const [contentChars, setContentChars] = useState(bot.content_chars ?? 0);
+  const maxPages = isPaid ? 16 : 5;
   const [trainedPages, setTrainedPages] = useState(bot.trained_pages);
   const [lastTrainedAt, setLastTrainedAt] = useState(bot.last_trained_at);
 
@@ -125,6 +134,7 @@ export default function BotSettingsForm({
   async function handleRetrain() {
     setRetraining(true);
     setRetrainError("");
+    setRetrainNotes([]);
     try {
       const res = await fetch(`/api/bots/${bot.id}/retrain`, { method: "POST" });
       const data = await res.json();
@@ -133,6 +143,9 @@ export default function BotSettingsForm({
       } else {
         setTrainedPages(data.bot.trained_pages ?? []);
         setLastTrainedAt(data.bot.last_trained_at ?? null);
+        setRetrainNotes(Array.isArray(data.notes) ? data.notes : []);
+        if (data.mode === "chunked" || data.mode === "full") setContentMode(data.mode);
+        if (typeof data.totalChars === "number") setContentChars(data.totalChars);
       }
     } catch {
       setRetrainError("Something went wrong. Try again.");
@@ -285,6 +298,13 @@ export default function BotSettingsForm({
             {bot.website_url}
             {lastTrainedAt && ` · last trained ${new Date(lastTrainedAt).toLocaleString()}`}
           </p>
+          <p className="mt-1 text-xs text-slate">
+            Your plan trains on up to {maxPages} pages
+            {isPaid ? "" : " (paid plans: 16 pages)"}.
+            {contentMode === "chunked"
+              ? ` Large site (${contentChars.toLocaleString()} characters): for each question the bot looks up the most relevant parts of your pages.`
+              : ""}
+          </p>
 
           {trainedPages.length > 0 && (
             <ul className="mt-3 flex flex-col gap-1 text-xs text-slate">
@@ -297,16 +317,23 @@ export default function BotSettingsForm({
           )}
 
           {retrainError && <p className="mt-2 text-sm text-red-600">{retrainError}</p>}
+          {retrainNotes.map((n, i) => (
+            <p key={i} className="mt-2 text-xs text-slate">
+              {n}
+            </p>
+          ))}
 
           <button
             onClick={handleRetrain}
             disabled={retraining}
             className="mt-4 rounded-lg border border-line px-4 py-2 text-sm font-semibold text-ink transition hover:bg-canvas disabled:opacity-50"
           >
-            {retraining ? "Retraining…" : "Retrain / resync from website"}
+            {retraining ? "Retraining… (can take up to a minute)" : "Retrain / resync from website"}
           </button>
         </div>
       )}
+
+      <ShopifyProductsPanel botId={bot.id} isPaid={isPaid} store={store} />
     </div>
   );
 }

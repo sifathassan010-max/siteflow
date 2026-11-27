@@ -21,7 +21,7 @@ export default async function BotSettingsPage({
     supabase
       .from("bots")
       .select(
-        "id, name, persona, website_url, quick_prompts, widget_color, logo_url, escalation_contact, model, custom_queries, avatar_config, widget_position, widget_offset_x, widget_offset_y, trained_pages, last_trained_at"
+        "id, name, persona, website_url, quick_prompts, widget_color, logo_url, escalation_contact, model, custom_queries, avatar_config, widget_position, widget_offset_x, widget_offset_y, trained_pages, last_trained_at, content_mode, content_chars"
       )
       .eq("id", id)
       .eq("user_id", user.id)
@@ -30,6 +30,14 @@ export default async function BotSettingsPage({
   ]);
 
   if (!bot) notFound();
+
+  // Shopify catalog status (owner-only via RLS). If the v11 SQL hasn't been
+  // run yet this just comes back empty instead of breaking the page.
+  const { data: store } = await supabase
+    .from("bot_stores")
+    .select("store_url, currency, source, product_count, total_found, capped, last_synced_at, last_error")
+    .eq("bot_id", bot.id)
+    .maybeSingle();
 
   return (
     <DashboardShell email={user.email ?? ""}>
@@ -43,7 +51,7 @@ export default async function BotSettingsPage({
       </p>
 
       <div className="mt-8 max-w-xl">
-        <BotSettingsForm bot={bot} isPaid={isPaid} />
+        <BotSettingsForm bot={bot} isPaid={isPaid} store={store} />
       </div>
     </DashboardShell>
   );

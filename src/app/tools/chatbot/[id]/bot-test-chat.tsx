@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
+import ChatMessageText from "@/components/chat-message-text";
 
 type Message = { role: "user" | "assistant"; content: string };
 
@@ -69,13 +70,13 @@ export default function BotTestChat({
           <div
             key={i}
             className={
-              "max-w-[85%] rounded-2xl px-4 py-2 text-sm " +
+              "max-w-[85%] whitespace-pre-wrap break-words rounded-2xl px-4 py-2 text-sm " +
               (m.role === "user"
                 ? "self-end bg-brand text-white"
                 : "self-start bg-canvas text-ink")
             }
           >
-            {m.content}
+            <ChatMessageText text={m.content} />
           </div>
         ))}
         {loading && (
