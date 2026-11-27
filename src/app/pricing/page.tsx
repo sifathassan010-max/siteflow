@@ -62,10 +62,9 @@ function money(n: number) {
 }
 
 export default async function PricingPage() {
-  // The $35.99 price is only ever shown when the referral Patreon tier is
-  // really set up (name + join URL in patreon-config.ts); otherwise a visitor
-  // could see a price they cannot buy.
-  const showReferralPrice = isReferralTierConfigured() && (await isReferredVisitor());
+  // The affiliate card is shown to everyone; only affiliate-referred visitors
+  // get a Buy button on it (and only if the tier is configured).
+  const canBuyAffiliate = isReferralTierConfigured() && (await isReferredVisitor());
 
   return (
     <div className="min-h-screen">
@@ -88,23 +87,10 @@ export default async function PricingPage() {
               className="flex w-full max-w-sm flex-1 flex-col rounded-2xl border border-line bg-white p-6 sm:min-w-[280px]"
             >
               <h3 className="font-bold">{plan.name}</h3>
-              {showReferralPrice && plan.referralMonthlyPrice !== undefined ? (
-                <p className="mt-3 text-3xl font-bold">
-                  ${money(plan.referralMonthlyPrice)}
-                  <span className="text-base font-medium text-slate">/mo</span>
-                  <span className="ml-2 text-base font-medium text-slate line-through">
-                    ${money(plan.monthlyPrice)}
-                  </span>
-                </p>
-              ) : (
-                <p className="mt-3 text-3xl font-bold">
-                  ${money(plan.monthlyPrice)}
-                  <span className="text-base font-medium text-slate">/mo</span>
-                </p>
-              )}
-              {showReferralPrice && plan.referralMonthlyPrice !== undefined && (
-                <p className="mt-1 text-xs text-slate">Referral price — applied through the referral plan on Patreon.</p>
-              )}
+              <p className="mt-3 text-3xl font-bold">
+                ${money(plan.monthlyPrice)}
+                <span className="text-base font-medium text-slate">/mo</span>
+              </p>
               <ul className="mt-4 flex flex-1 flex-col gap-2 text-sm text-slate">
                 {plan.features.map((f) => (
                   <li key={f} className="flex items-start gap-2">
@@ -120,10 +106,55 @@ export default async function PricingPage() {
                 Start free trial
               </Link>
               <PatreonBuyButton
-                referral={showReferralPrice && plan.referralMonthlyPrice !== undefined}
                 wrapperClassName="mt-2"
                 className="w-full rounded-full bg-brand px-4 py-2 text-center text-sm font-semibold text-white transition hover:bg-brand-hover"
               />
+            </div>
+          ))}
+
+          {/* Separate tier: same product, sold at the affiliate price. Always
+              visible; only visitors who came through an affiliate link can buy. */}
+          {TOOL_PLANS.filter((p) => p.referralMonthlyPrice !== undefined).map((plan) => (
+            <div
+              key={`${plan.name}-affiliate`}
+              className="flex w-full max-w-sm flex-1 flex-col rounded-2xl border border-brand bg-white p-6 sm:min-w-[280px]"
+            >
+              <h3 className="font-bold">{plan.name} Affiliate</h3>
+              <p className="mt-3 text-3xl font-bold">
+                ${money(plan.referralMonthlyPrice!)}
+                <span className="text-base font-medium text-slate">/mo</span>
+                <span className="ml-2 text-base font-medium text-slate line-through">
+                  ${money(plan.monthlyPrice)}
+                </span>
+              </p>
+              <p className="mt-1 text-xs text-slate">
+                Same plan as {plan.name}, for customers who sign up through an affiliate link.
+              </p>
+              <ul className="mt-4 flex flex-1 flex-col gap-2 text-sm text-slate">
+                {plan.features.map((f) => (
+                  <li key={f} className="flex items-start gap-2">
+                    <Check />
+                    {f}
+                  </li>
+                ))}
+              </ul>
+              <Link
+                href="/login"
+                className="mt-5 rounded-full border border-line px-4 py-2 text-center text-sm font-semibold text-ink transition hover:border-ink/30"
+              >
+                Start free trial
+              </Link>
+              {canBuyAffiliate ? (
+                <PatreonBuyButton
+                  referral
+                  wrapperClassName="mt-2"
+                  className="w-full rounded-full bg-brand px-4 py-2 text-center text-sm font-semibold text-white transition hover:bg-brand-hover"
+                />
+              ) : (
+                <p className="mt-2 rounded-full border border-line px-4 py-2 text-center text-sm text-slate">
+                  Available only through an affiliate link
+                </p>
+              )}
             </div>
           ))}
         </div>
