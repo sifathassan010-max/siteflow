@@ -1,4 +1,4 @@
-// Server-only. Enforces the "$25 = 1,000 calls/month" API plans.
+// Server-only. Enforces the "$39.99 = 1,000 calls/month" API plans.
 // Every src/app/api/v1/** route calls checkApiUsageLimit() before doing
 // the expensive work, then logApiUsage() after a successful response.
 //
@@ -11,7 +11,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 export const API_TOOLS = ["chatbot"] as const;
 export type ApiTool = (typeof API_TOOLS)[number];
 
-// Calls per month included with a single-tool API plan ($25/mo). The
+// Calls per month included with a single-tool API plan ($39.99/mo). The
 // "All Access API" plan grants this same 1,000/mo allowance per
 // tool, for every tool at once, not a combined/shared pool.
 export const MONTHLY_CALL_LIMIT = 1000;

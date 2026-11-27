@@ -55,7 +55,7 @@ export type ApiPricingPlan = {
 export const API_TOOL_PLANS: ApiPricingPlan[] = [
   {
     name: "Chatbot API",
-    monthlyPrice: 25,
+    monthlyPrice: 39.99,
     callsPerMonth: 1000,
     features: ["Query one of your trained bots", "Structured JSON replies", "1,000 calls/month"],
   },

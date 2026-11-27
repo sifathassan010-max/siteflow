@@ -17,14 +17,13 @@ export const PATREON_JOIN_URL = "https://www.patreon.com/15895599/join";
 // visitors who arrived through an affiliate link. Same tools as the
 // normal "Chatbot Builder" tier.
 //
-// YOUR INPUT: put the EXACT name of the referral tier you create on
-// Patreon here (case doesn't matter). Until you change it, nothing
-// matches it, and /pricing keeps showing $39.99 to everybody.
-export const REFERRAL_TIER_TITLE = "YOUR INPUT: referral tier name";
+// The Patreon tier for affiliate visitors MUST be created with exactly this
+// name (case doesn't matter, spacing does).
+export const REFERRAL_TIER_TITLE = "Chatbot Builder Affiliate";
 
-// YOUR INPUT: the Patreon join URL of the referral tier. Leave "" until
-// you have it — /pricing then never shows the $35.99 price.
-export const PATREON_REFERRAL_JOIN_URL = "";
+// Same Patreon page as everything else: the patron picks the tier there.
+// If you later get a direct link to the affiliate tier, put it here instead.
+export const PATREON_REFERRAL_JOIN_URL = PATREON_JOIN_URL;
 
 export function isReferralTierConfigured(): boolean {
   return (
@@ -69,7 +68,7 @@ export function tiersToUnlockedTools(tierTitles: string[]): string[] {
 // programmatically (see src/app/api/v1/**), rather than logging into
 // the dashboard. Sold and billed separately from the tiers above, so a
 // customer can have dashboard access, API access, both, or neither.
-// $25/mo = 1,000 calls/mo for that one tool's API.
+// $39.99/mo = 1,000 calls/mo (same price for everyone, no affiliate discount) for that one tool's API.
 // ============================================================
 export const TIER_API_TOOL_MAP: Record<string, string[]> = {
   "chatbot api": ["chatbot"],
